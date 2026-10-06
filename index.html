@@ -1041,19 +1041,76 @@ function vCalc(){
   </section>
   <div>
     <section class="panel"><h3>Расчёт подробно</h3><div id="cdetail"></div>
-      <div class="row-actions" style="margin-top:14px">${W(`<button class="btn pri" data-a="calc-deal">Оформить сделку</button>`)}<button class="btn" data-a="calc-wa">Отправить клиенту</button><button class="btn" data-a="calc-copy">Скопировать</button></div></section>
+      <div class="row-actions" style="margin-top:14px">${W(`<button class="btn pri" data-a="calc-deal">Оформить сделку</button>`)}<button class="btn" data-a="calc-share">Отправить картинкой</button><button class="btn" data-a="calc-copy">Скопировать текстом</button></div></section>
   </div></div>`;
 }
 function calcResult(){const s=calcState(),st=calcSettings();return calcInstallment(s.price,s.down,s.months,st.rate,st.round)}
 function updateCalc(){
   const r=calcResult();const el=$("#cres");if(!el)return;
   el.innerHTML=`<div class="main"><div class="l">Ежемесячный платёж</div><div class="v">${rub(r.monthly)}</div></div><div><div class="l">Торговая наценка</div><div class="v">${rub(r.markup)}</div></div><div><div class="l">Общая стоимость</div><div class="v">${rub(r.total)}</div></div>`;
+  prepCalcImage();
   $("#cfoot").textContent=r.fin>0?`${r.n} ${plural(r.n,"платёж","платежа","платежей")} по ${rub(r.monthly)}${r.last!==r.monthly?", последний "+rub(r.last):""}`:"Укажите стоимость больше первого взноса";
   const today=todayISO();
   $("#cdetail").innerHTML=r.fin>0?`<dl class="kv"><dt>Стоимость</dt><dd>${rub(r.price)}</dd><dt>Первый взнос</dt><dd>${rub(r.down)}</dd><dt>Сумма в рассрочку</dt><dd>${rub(r.fin)}</dd><dt>Наценка</dt><dd>${rub(r.markup)}</dd><div class="sep"></div><dt class="strong">Общая стоимость</dt><dd class="strong">${rub(r.total)}</dd></dl>
     <div class="tw keep" style="margin-top:12px"><table><thead><tr><th>№</th><th>Примерная дата</th><th class="n">Сумма</th></tr></thead><tbody>${Array.from({length:r.n},(_,i)=>`<tr><td>${i+1}</td><td>${fmtD(addMonths(today,i+1))}</td><td class="n">${rub(i===r.n-1?r.last:r.monthly)}</td></tr>`).join("")}</tbody></table></div>`:`<p class="muted small">Нет суммы для рассрочки.</p>`;
 }
 function calcText(){const r=calcResult();return `Расчёт рассрочки AMANAT\nСтоимость: ${rub(r.price)}\nПервый взнос: ${rub(r.down)}\nСрок: ${r.n} мес.\nЕжемесячный платёж: ${rub(r.monthly)}${r.last!==r.monthly?" (последний "+rub(r.last)+")":""}\nОбщая стоимость: ${rub(r.total)}\nБез процентов и штрафов — цена фиксируется в договоре.`.replace(/[\u00a0\u202f]/g," ")}
+
+
+/* ---------- calculation as image ---------- */
+let calcBlob=null,calcBlobT=null,calcBlobKey="";
+function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+function drawCalcImage(){
+  const r=calcResult(),co=comp();const W=1080,H=1350;
+  const cv=document.createElement("canvas");cv.width=W;cv.height=H;const c=cv.getContext("2d");
+  const D='"Unbounded","Golos Text",Arial,sans-serif',T='"Golos Text",Arial,sans-serif';
+  const sp=s=>String(s).replace(/[\u00a0\u202f]/g," ");
+  const g=c.createLinearGradient(0,0,W,H);g.addColorStop(0,"#0E5B53");g.addColorStop(.6,"#0A403B");g.addColorStop(1,"#082F2B");c.fillStyle=g;c.fillRect(0,0,W,H);
+  c.strokeStyle="rgba(217,174,85,.14)";c.lineWidth=70;c.beginPath();c.arc(W-40,40,230,0,Math.PI*2);c.stroke();
+  c.strokeStyle="rgba(217,174,85,.08)";c.lineWidth=40;c.beginPath();c.arc(60,H-30,200,0,Math.PI*2);c.stroke();
+  // brand
+  c.fillStyle="#D9AE55";rr(c,70,70,92,92,24);c.fill();
+  c.fillStyle="#0A403B";c.font=`700 52px ${D}`;c.textAlign="center";c.textBaseline="middle";c.fillText("A",116,118);
+  c.textAlign="left";c.fillStyle="#fff";c.font=`700 42px ${D}`;c.fillText("AMANAT",186,104);
+  c.fillStyle="rgba(255,255,255,.7)";c.font=`400 26px ${T}`;c.fillText("честная рассрочка",188,146);
+  // title
+  c.textBaseline="alphabetic";c.fillStyle="#fff";c.font=`700 64px ${D}`;c.fillText("Расчёт рассрочки",70,282);
+  c.fillStyle="rgba(255,255,255,.7)";c.font=`400 30px ${T}`;c.fillText("от "+fmtD(todayISO())+" · расчёт предварительный",72,330);
+  // white card
+  const cx=70,cw=W-140;let y=380;
+  c.fillStyle="#fff";rr(c,cx,y,cw,300,32);c.fill();
+  const rows=[["Стоимость товара",rub(r.price)],["Первоначальный взнос",rub(r.down)],["Срок рассрочки",r.n+" "+plural(r.n,"месяц","месяца","месяцев")]];
+  rows.forEach(([l,v],i)=>{const yy=y+70+i*90;c.fillStyle="#5A6B6C";c.font=`400 34px ${T}`;c.textAlign="left";c.fillText(l,cx+44,yy+12);
+    c.fillStyle="#0F2A2A";c.font=`600 40px ${T}`;c.textAlign="right";c.fillText(sp(v),cx+cw-44,yy+12);
+    if(i<2){c.fillStyle="#E3E9E7";c.fillRect(cx+44,yy+50,cw-88,2)}});
+  // monthly highlight
+  y+=330;c.fillStyle="#F4EAD3";rr(c,cx,y,cw,250,32);c.fill();
+  c.textAlign="center";c.fillStyle="#7A5713";c.font=`500 36px ${T}`;c.fillText("Ежемесячный платёж",W/2,y+70);
+  c.font=`700 104px ${D}`;let fs=104;while(c.measureText(sp(rub(r.monthly))).width>cw-80&&fs>60){fs-=4;c.font=`700 ${fs}px ${D}`}c.fillText(sp(rub(r.monthly)),W/2,y+175);
+  c.font=`400 30px ${T}`;c.fillStyle="#8A6A2A";c.fillText(r.last!==r.monthly?`последний платёж ${sp(rub(r.last))}`:`${r.n} ${plural(r.n,"платёж","платежа","платежей")} одинаковыми суммами`,W/2,y+222);
+  // two boxes
+  y+=280;const bw=(cw-30)/2;
+  [["Торговая наценка",rub(r.markup)],["Общая стоимость",rub(r.total)]].forEach(([l,v],i)=>{const bx=cx+i*(bw+30);c.fillStyle="#fff";rr(c,bx,y,bw,170,28);c.fill();
+    c.textAlign="center";c.fillStyle="#5A6B6C";c.font=`400 30px ${T}`;c.fillText(l,bx+bw/2,y+58);
+    c.fillStyle="#0E5B53";c.font=`700 48px ${D}`;let f2=48;while(c.measureText(sp(v)).width>bw-40&&f2>30){f2-=2;c.font=`700 ${f2}px ${D}`}c.fillText(sp(v),bx+bw/2,y+128)});
+  // footer
+  y+=225;c.textAlign="left";c.fillStyle="#D9AE55";c.font=`600 32px ${T}`;c.fillText("Без процентов и штрафов",cx,y);
+  c.fillStyle="rgba(255,255,255,.78)";c.font=`400 28px ${T}`;c.fillText("Цена фиксируется в договоре и не растёт при просрочке.",cx,y+44);
+  c.fillText("Первый платёж — через месяц после оформления.",cx,y+84);
+  if(co.phone){c.textAlign="right";c.textBaseline="middle";c.fillStyle="#fff";c.font=`600 30px ${T}`;c.fillText(sp(co.phone),W-70,118);c.textBaseline="alphabetic"}
+  return cv;
+}
+function prepCalcImage(){clearTimeout(calcBlobT);calcBlobT=setTimeout(async()=>{try{await document.fonts.ready}catch(e){}const r=calcResult();const key=JSON.stringify(r);const cv=drawCalcImage();cv.toBlob(b=>{calcBlob=b;calcBlobKey=key},"image/png")},250)}
+async function shareCalc(){
+  const r=calcResult();if(r.fin<=0){toast("Укажите стоимость больше первого взноса");return}
+  let blob=calcBlob;if(!blob||calcBlobKey!==JSON.stringify(r)){blob=await new Promise(res=>drawCalcImage().toBlob(res,"image/png"))}
+  const name="Расчёт_рассрочки_"+r.price+"_"+r.n+"мес.png";
+  const file=new File([blob],name,{type:"image/png"});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){
+    try{await navigator.share({files:[file]});return}catch(e){if(e&&e.name==="AbortError")return}
+  }
+  if(saveBlob(name,blob))toast("Картинка сохранена — отправьте её клиенту из галереи");
+}
 
 /* ---------- company ---------- */
 function mCompany(){
@@ -1471,7 +1528,7 @@ document.addEventListener("click",async e=>{
   switch(a){
     case "close":closeModal();break;
     case "calc-deal":{const r=calcResult();mNewDeal(null);setTimeout(()=>{if(!dlg.querySelector("[name=price]"))return;const set=(n,v)=>{const x=dlg.querySelector(`[name=${n}]`);if(x)x.value=v};const sel=dlg.querySelector("[name=productId]");if(sel){const m=S.products.find(p=>!productStatus(p).sold&&num(p.cost)===r.price);if(m)sel.value=m.id}set("down",r.down);set("count",r.n);set("period","month");const p=sel&&byId("products",sel.value);const cost=p?num(p.cost):r.price;set("price",cost+r.markup+(cost!==r.price?0:0));set("markup",cost+r.markup-cost);dealCalcPreview("markup")},30)}break;
-    case "calc-wa":window.open("https://wa.me/?text="+encodeURIComponent(calcText()),"_blank","noopener");break;
+    case "calc-share":shareCalc();break;
     case "calc-copy":{const tx=calcText();(navigator.clipboard?navigator.clipboard.writeText(tx):Promise.reject()).then(()=>toast("Расчёт скопирован")).catch(()=>{const ta=document.createElement("textarea");ta.value=tx;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");toast("Расчёт скопирован")}catch(_){toast("Не удалось скопировать")}ta.remove()})}break;
     case "calc-save":{const rate=num(($("#c_rate")||{}).value),rnd=num(($("#c_round")||{}).value)||1;if(rate<0||rate>20){toast("Ставка от 0 до 20%");break}if(await save("company","main",{...strip(comp()),rate,roundTo:rnd}))toast("Ставка сохранена: "+String(rate).replace(".",",")+"% в месяц")}break;
     case "contract":contractPDF(id);break;
