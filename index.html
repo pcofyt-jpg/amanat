@@ -3,8 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>AMANAT — учёт рассрочки</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🤝%3C/text%3E%3C/svg%3E">
+<title>AMANA — учёт рассрочки</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' rx='46' fill='%230A403B'/%3E%3Cpath d='M54 156V96C54 66 78 47 100 34C122 47 146 66 146 96V156' fill='none' stroke='%23D9AE55' stroke-width='12' stroke-linejoin='round'/%3E%3Cpath d='M40 156H160' stroke='%23D9AE55' stroke-width='12' stroke-linecap='round'/%3E%3Ccircle cx='100' cy='98' r='15' fill='%23D9AE55'/%3E%3Cpath d='M92 106L86 136H114L108 106Z' fill='%23D9AE55'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="icon-192.png">
 <meta name="theme-color" content="#0E5B53">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -43,6 +44,11 @@ a{color:var(--primary)}
 .top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
 .top-in{max-width:1180px;margin:0 auto;padding:12px 20px 0;display:flex;flex-direction:column;gap:10px}
 .brand{display:flex;align-items:baseline;gap:12px;justify-content:space-between}
+.lockup{display:inline-flex;align-items:center;gap:10px;vertical-align:middle;color:var(--primary)}
+.lockup .lmark{flex:0 0 auto;border-radius:8px}
+.lockup.big{flex-direction:column;gap:12px}
+.cc .nm{color:#fff;display:flex}
+.lmark.inv rect{fill:#D9AE55}.lmark.inv path,.lmark.inv circle{stroke:#0A403B}.lmark.inv circle,.lmark.inv path[fill="#D9AE55"]{fill:#0A403B}
 .logo{font-family:Unbounded,"Golos Text",sans-serif;font-weight:700;font-size:20px;letter-spacing:.02em;color:var(--primary)}
 .motto{color:var(--ink-3);font-size:13px}
 .nav{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;margin:0 -4px}
@@ -182,6 +188,21 @@ tr.sel td{background:var(--primary-soft)}
 .ribbon.big i{height:14px;border-radius:3px}
 
 .filters{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.nav .cnt.new{background:var(--brass-soft);color:var(--brass)}
+.applist{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.app{margin:0}
+.app .ah{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:10px}
+.app .t{font-weight:700;font-size:17px}
+.app .kv{margin-bottom:10px}
+.app .kv dd{text-align:right;overflow-wrap:anywhere}
+.app .pimg{width:84px;height:84px;object-fit:cover;border-radius:10px;border:1px solid var(--line);cursor:zoom-in;margin-bottom:10px}
+.app .acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.app .acts select{border:1px solid var(--line);background:var(--surface-2);border-radius:8px;padding:7px 10px;color:var(--ink)}
+.app input.anote{width:100%;border:1px solid var(--line);background:var(--surface-2);border-radius:8px;padding:8px 10px;color:var(--ink);margin-bottom:10px}
+.app.st-new{border-color:var(--brass);box-shadow:inset 4px 0 0 var(--brass)}
+.linkbox{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.linkbox code{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:7px 10px;font-size:13px;overflow-wrap:anywhere;flex:1 1 240px}
+@media (max-width:640px){.applist{grid-template-columns:1fr}}
 .chip{border:1px solid var(--line);background:var(--surface);border-radius:20px;padding:5px 12px;font-size:13px;cursor:pointer}
 .chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .search{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 12px;min-width:200px}
@@ -289,7 +310,7 @@ dialog::backdrop{background:rgba(10,20,20,.45)}
 <header class="top">
   <div class="top-in">
     <div class="brand">
-      <div class="logo">AMANAT</div>
+      <div class="logo"><span class="lockup"><svg class="lmark" viewBox="0 0 200 200" width="30" height="30" aria-hidden="true"><rect width="200" height="200" rx="46" fill="#0A403B"/><path d="M54 156V96C54 66 78 47 100 34C122 47 146 66 146 96V156" fill="none" stroke="#D9AE55" stroke-width="12" stroke-linejoin="round"/><path d="M40 156H160" stroke="#D9AE55" stroke-width="12" stroke-linecap="round"/><circle cx="100" cy="98" r="15" fill="#D9AE55"/><path d="M92 106L86 136H114L108 106Z" fill="#D9AE55"/></svg><svg class="lword" viewBox="-6 0 392 80" height="19" style="width:auto;overflow:hidden" role="img" aria-label="AMANA"><g fill="none" stroke="currentColor" stroke-width="11" stroke-miterlimit="10"><path d="M-2 86L30-4L62 86M13 54H47M80 86V0L110 54L140 0V86M158 86L190-4L222 86M173 54H207M240 86V0L300 80M300 86V-6M318 86L350-4L382 86M333 54H367"/></g></svg></span></div>
       <div style="display:flex;gap:10px;align-items:center"><div class="motto">Честная торговля. Честная рассрочка.</div><span id="meBox"></span></div>
     </div>
     <nav class="nav" id="nav" aria-label="Разделы"></nav>
@@ -312,13 +333,14 @@ window.AMANAT_CONFIG={
 <script>
 (function(){
 "use strict";
+const LOGO_BIG='<span class="lockup big"><svg class="lmark" viewBox="0 0 200 200" width="46" height="46" aria-hidden="true"><rect width="200" height="200" rx="46" fill="#0A403B"/><path d="M54 156V96C54 66 78 47 100 34C122 47 146 66 146 96V156" fill="none" stroke="#D9AE55" stroke-width="12" stroke-linejoin="round"/><path d="M40 156H160" stroke="#D9AE55" stroke-width="12" stroke-linecap="round"/><circle cx="100" cy="98" r="15" fill="#D9AE55"/><path d="M92 106L86 136H114L108 106Z" fill="#D9AE55"/></svg><svg class="lword" viewBox="-6 0 392 80" height="26" style="width:auto;overflow:hidden" role="img" aria-label="AMANA"><g fill="none" stroke="currentColor" stroke-width="11" stroke-miterlimit="10"><path d="M-2 86L30-4L62 86M13 54H47M80 86V0L110 54L140 0V86M158 86L190-4L222 86M173 54H207M240 86V0L300 80M300 86V-6M318 86L350-4L382 86M333 54H367"/></g></svg></span>';
 const COLS=["clients","products","deals","payments","loans","partners","expenses","cash","photos","payouts","company"];
 const comp=()=>S.company.find(x=>x.id==="main")||{};
 const S={}; COLS.forEach(c=>S[c]=[]);
 let db=null, userCap=null, downloads=null, ME={id:null,isOwner:false,name:"",avatarUrl:""}, SETTINGS={roles:{},requirePin:false}, MEMBERS=[], LOG=[], NAMES={}, PIN=null, gateReady=false, unlocked=false, pinFails=0, pinBlockUntil=0, canWrite=true, loaded=new Set(), offline=false;
-const TABS=[["home","Сводка"],["calc","Калькулятор"],["deals","Сделки"],["clients","Клиенты"],["products","Товары"],["cash","Касса"],["capital","Займы и партнёры"],["expenses","Расходы"],["reports","Отчёты"],["zakat","Закят"],["log","Журнал"],["access","Доступ"],["rules","Правила"]];
+const TABS=[["home","Сводка"],["apps","Заявки"],["calc","Калькулятор"],["deals","Сделки"],["clients","Клиенты"],["products","Товары"],["cash","Касса"],["capital","Займы и партнёры"],["expenses","Расходы"],["reports","Отчёты"],["zakat","Закят"],["log","Журнал"],["access","Доступ"],["rules","Правила"]];
 const FULL_ONLY=["cash","capital","reports","log","zakat"];
-const visTabs=()=>TABS.filter(([k])=>isFull()||!FULL_ONLY.includes(k));
+const visTabs=()=>TABS.filter(([k])=>(isFull()||!FULL_ONLY.includes(k))&&(k!=="apps"||(canAdd()&&!offline)));
 let tab="home"; try{tab=localStorage.getItem("amanat-tab")||"home"}catch(e){}
 if(!TABS.some(t=>t[0]===tab)) tab="home";
 const ui={dealFilter:"all",q:""};
@@ -425,7 +447,8 @@ function describe(col,d){
     case "cash":return `Касса: ${d.desc||""} ${d.dir==="in"?"+":"−"}${rub(num(d.amount))}`;
     case "photos":return `Фото «${d.kind||""}» — клиент ${cl(d.clientId)}`;
     case "payouts":return `Выплата прибыли — ${partnerName(d.partnerId)}, ${rub(num(d.amount))}${d.label?" за "+d.label:""}`;
-    case "company":return "Реквизиты и настройки AMANAT";
+    case "company":return "Реквизиты и настройки AMANA";
+    case "applications":return "Заявка";
   }
   return COLNAMES[col]||col;
 }
@@ -467,12 +490,12 @@ function draw(){
   if(!visTabs().some(t=>t[0]===tab))tab="home";
   const deals=allDeals();
   const od=deals.filter(x=>x.c.status==="overdue").length;
-  $("#nav").innerHTML=visTabs().map(([k,l])=>`<button data-tab="${k}" ${k===tab?'aria-current="page"':""}>${l}${k==="deals"&&od?`<span class="cnt">${od}</span>`:""}</button>`).join("");
+  $("#nav").innerHTML=visTabs().map(([k,l])=>`<button data-tab="${k}" ${k===tab?'aria-current="page"':""}>${l}${k==="deals"&&od?`<span class="cnt">${od}</span>`:""}${k==="apps"&&appsNew()?`<span class="cnt new">${appsNew()}</span>`:""}</button>`).join("");
   let h="";
   if(offline) h+=`<div class="banner">Нет связи с базой данных. Проверьте интернет и настройки Supabase в начале файла index.html.</div>`;
   else if(!canWrite) h+=`<div class="banner">У вас доступ только для просмотра. Попросите владельца выдать права на изменение.</div>`;
   else if(role()==="view") h+=`<div class="banner">Ваша роль — «Просмотр»: вносить изменения нельзя.</div>`;
-  const V={calc:vCalc,zakat:vZakat,log:vLog,access:vAccess,home:vHome,deals:vDeals,clients:vClients,products:vProducts,cash:vCash,capital:vCapital,expenses:vExpenses,reports:vReports,rules:vRules};
+  const V={apps:vApps,calc:vCalc,zakat:vZakat,log:vLog,access:vAccess,home:vHome,deals:vDeals,clients:vClients,products:vProducts,cash:vCash,capital:vCapital,expenses:vExpenses,reports:vReports,rules:vRules};
   h+=V[tab](deals);
   const app=$("#app"); const y=window.scrollY; app.innerHTML=h; window.scrollTo(0,y);
   if(tab==="calc")updateCalc();
@@ -548,8 +571,8 @@ function vHome(deals){
 function waLink(c,x,late){
   const ph=c.client&&phoneDigits(c.client.phone); if(!ph)return "";
   const name=c.client.name;
-  const txt=late?`Ассаляму алейкум, ${name}! Напоминаем, что ${fmtD(x.due)} был срок платежа по рассрочке AMANAT — ${rub(x.left)}. Когда вам будет удобно внести?`
-                :`Ассаляму алейкум, ${name}! Напоминаем о платеже по рассрочке AMANAT: ${rub(x.left)} до ${fmtD(x.due)}. БаракаЛлаху фикум!`;
+  const txt=late?`Ассаляму алейкум, ${name}! Напоминаем, что ${fmtD(x.due)} был срок платежа по рассрочке AMANA — ${rub(x.left)}. Когда вам будет удобно внести?`
+                :`Ассаляму алейкум, ${name}! Напоминаем о платеже по рассрочке AMANA: ${rub(x.left)} до ${fmtD(x.due)}. БаракаЛлаху фикум!`;
   return `<a class="btn sm" target="_blank" rel="noopener" href="https://wa.me/${ph}?text=${encodeURIComponent(txt)}">WhatsApp</a>`;
 }
 
@@ -583,7 +606,7 @@ function vClients(){
 function vProducts(){
   const list=[...S.products].sort((a,b)=>(b.date||"").localeCompare(a.date||""));
   return `<div class="head"><h2>Товары</h2>${W(`<button class="btn pri" data-a="new-product">Добавить товар</button>`)}</div>
-  <p class="small muted" style="margin:-6px 0 14px">Товар заносится сюда в момент покупки, до продажи клиенту: AMANAT сначала владеет вещью, потом продаёт её.</p>
+  <p class="small muted" style="margin:-6px 0 14px">Товар заносится сюда в момент покупки, до продажи клиенту: AMANA сначала владеет вещью, потом продаёт её.</p>
   ${list.length?`<div class="tw"><table><thead><tr><th>ID</th><th>Товар</th><th class="hide-m">IMEI / серийный</th><th class="n">Себестоимость</th><th>Куплен</th><th class="hide-m">Поставщик</th><th>Статус</th><th class="n">Наценка</th></tr></thead><tbody>
   ${(()=>{const T={cost:0,mk:0,stock:0,stockCost:0};const rows=list.map(p=>{const st=productStatus(p);const c=st.sold?dealCalc(st.deal):null;T.cost+=num(p.cost);if(c)T.mk+=c.markup;else{T.stock++;T.stockCost+=num(p.cost)}return `<tr class="click" data-a="product" data-id="${p.id}"><td>${esc(p.code)}</td><td>${esc([p.name,p.model].filter(Boolean).join(" "))}<div class="small muted">${esc(p.category||"")}</div></td><td class="hide-m">${esc(p.serial||"—")}</td><td class="n">${rub(num(p.cost))}</td><td class="nw">${fmtD(p.date)}</td><td class="hide-m">${esc(p.supplier||"")}</td><td>${st.sold?`<span class="tag gray">Продан · ${esc(st.deal.code)}</span>`:`<span class="tag mid">На складе</span>`}</td><td class="n">${c?rub(c.markup):"—"}</td></tr>`}).join("");
   return rows+`</tbody><tfoot><tr><td colspan="2">Итого: ${list.length} шт</td><td class="hide-m"></td><td class="n">${rub(T.cost)}<div class="small muted" style="font-weight:500">куплено</div></td><td></td><td class="hide-m"></td><td class="small" style="font-weight:500">на складе ${T.stock} шт · ${rub(T.stockCost)}</td><td class="n">${rub(T.mk)}<div class="small muted" style="font-weight:500">наценка</div></td></tr></tfoot>`})()}
@@ -630,7 +653,7 @@ function vExpenses(){
 }
 
 function vRules(){
-  const R=[["Реальное владение товаром (кабд)","Товар должен быть куплен и находиться в собственности AMANAT до продажи клиенту. Поэтому сделку можно оформить только на товар, который уже есть в разделе «Товары»."],
+  const R=[["Реальное владение товаром (кабд)","Товар должен быть куплен и находиться в собственности AMANA до продажи клиенту. Поэтому сделку можно оформить только на товар, который уже есть в разделе «Товары»."],
   ["Фиксированная цена (мурабаха)","Цена фиксируется при заключении договора. В приложении цену и график сделки нельзя изменить после сохранения — только удалить ошибочную сделку, пока по ней нет платежей."],
   ["Прозрачный график","Количество платежей, даты и суммы известны клиенту до подписания. График строится автоматически и не меняется."],
   ["Запрет рибы и пени","При просрочке долг не растёт. Приложение не начисляет никаких штрафов и процентов."],
@@ -716,7 +739,7 @@ function mProduct(id){
     ${field("name","Наименование",{value:p.name,req:1,ph:"iPhone"})}${field("model","Модель",{value:p.model,ph:"15 Pro 128GB"})}
     ${field("serial","IMEI / серийный номер",{value:p.serial,full:1})}
     ${field("cost","Себестоимость, ₽",{type:"number",value:p.cost,req:1})}${field("date","Дата покупки",{type:"date",value:p.date,req:1})}
-    ${field("supplier","Поставщик",{value:p.supplier})}${field("fromCash","Оплачен из кассы AMANAT",{type:"select",blank:false,value:p.fromCash===false?"no":"yes",options:[["yes","Да — списать из кассы"],["no","Нет — оплачен отдельно"]]})}
+    ${field("supplier","Поставщик",{value:p.supplier})}${field("fromCash","Оплачен из кассы AMANA",{type:"select",blank:false,value:p.fromCash===false?"no":"yes",options:[["yes","Да — списать из кассы"],["no","Нет — оплачен отдельно"]]})}
     ${sold?`<div class="note">Товар уже продан (${esc(productStatus(p).deal.code)}). Себестоимость можно поправить, цена продажи клиенту не изменится.</div>`:""}
     ${datalist("cats",LISTS.cat)}
   </div>`,footSave("save-product",id,id&&!sold?"del-product":null));
@@ -726,7 +749,7 @@ async function saveProduct(id){const o=formData();if(!need(o,[["code","ID тов
 /* deal */
 function mNewDeal(clientId){
   const stock=S.products.filter(p=>!productStatus(p).sold);
-  if(!stock.length){openModal("Новая сделка",`<p>Сначала добавьте товар: по правилам мурабахи AMANAT продаёт только то, чем уже владеет.</p>`,`<button class="btn" data-a="close">Отмена</button>${W(`<button class="btn pri" data-a="new-product">Добавить товар</button>`)}`);return}
+  if(!stock.length){openModal("Новая сделка",`<p>Сначала добавьте товар: по правилам мурабахи AMANA продаёт только то, чем уже владеет.</p>`,`<button class="btn" data-a="close">Отмена</button>${W(`<button class="btn pri" data-a="new-product">Добавить товар</button>`)}`);return}
   if(!S.clients.length){openModal("Новая сделка",`<p>Сначала добавьте клиента.</p>`,`<button class="btn" data-a="close">Отмена</button>${W(`<button class="btn pri" data-a="new-client">Добавить клиента</button>`)}`);return}
   openModal("Новая сделка",`<div class="form">
     ${field("code","Номер сделки",{value:nextCode("deals","S",3),req:1})}${field("date","Дата сделки",{type:"date",value:todayISO(),req:1})}
@@ -763,7 +786,7 @@ async function saveDeal(){
   if(n<1||n>120)return showErr("Количество платежей от 1 до 120");
   if(price<=0)return showErr("Укажите цену продажи");
   if(down>=price)return showErr("Первый взнос должен быть меньше цены");
-  if(p&&o.date<p.date)return showErr("Дата сделки раньше даты покупки товара — AMANAT ещё не владел им");
+  if(p&&o.date<p.date)return showErr("Дата сделки раньше даты покупки товара — AMANA ещё не владела им");
   const d={code:o.code,date:o.date,clientId:o.clientId,productId:o.productId,cost:p?num(p.cost):0,price,down,count:o.period==="once"?1:n,period:o.period,manager:o.manager,note:o.note,createdAt:new Date().toISOString()};
   if(await save("deals",null,d)){closeModal();toast("Сделка оформлена, график построен")}
 }
@@ -896,21 +919,21 @@ function gateView(){
   if(offline||!db)return "";
   if(!gateReady)return `<div class="empty">Проверяю доступ…</div>`;
   const r=role();
-  if(r==="pending"||r==="blocked")return `<div class="lockwrap"><div class="lockcard"><div class="logo">AMANAT</div><h2>${r==="blocked"?"Доступ закрыт":"Ожидайте доступа"}</h2><p class="muted">${r==="blocked"?"Администратор закрыл вам доступ к приложению.":"Вы вошли впервые. Администратор должен выдать вам роль — после этого страница откроется сама."}</p><p class="small muted">Вы: <b>${esc(ME.name||"пользователь без имени")}</b></p></div></div>`;
+  if(r==="pending"||r==="blocked")return `<div class="lockwrap"><div class="lockcard"><div class="logo">${LOGO_BIG}</div><h2>${r==="blocked"?"Доступ закрыт":"Ожидайте доступа"}</h2><p class="muted">${r==="blocked"?"Администратор закрыл вам доступ к приложению.":"Вы вошли впервые. Администратор должен выдать вам роль — после этого страница откроется сама."}</p><p class="small muted">Вы: <b>${esc(ME.name||"пользователь без имени")}</b></p></div></div>`;
   if(!PIN&&SETTINGS.requirePin&&canWrite)return pinSetupView(true);
   if(PIN&&!unlocked)return lockView();
   return "";
 }
 function lockView(){
   const wait=pinBlockUntil>Date.now();
-  return `<div class="lockwrap"><div class="lockcard"><div class="logo">AMANAT</div><h2>Введите ПИН-код</h2><p class="small muted" style="margin:0">${esc(who(ME.id))}</p>
+  return `<div class="lockwrap"><div class="lockcard"><div class="logo">${LOGO_BIG}</div><h2>Введите ПИН-код</h2><p class="small muted" style="margin:0">${esc(who(ME.id))}</p>
   <input id="pin1" class="pinin" type="password" inputmode="numeric" autocomplete="off" maxlength="6" ${wait?"disabled":""} aria-label="ПИН-код">
   <div class="pinerr" id="pinerr">${wait?"Слишком много попыток. Подождите 30 секунд.":""}</div>
   <button class="btn pri" style="width:100%;justify-content:center" data-a="unlock" ${wait?"disabled":""}>Войти</button>
   <p class="small muted" style="margin:14px 0 0">${ME.isOwner?`Забыли ПИН? <button class="lockbtn" data-a="reset-own-pin">Сбросить</button>`:"Забыли ПИН? Попросите администратора сбросить его во вкладке «Доступ»."}</p></div></div>`;
 }
 function pinSetupView(forced){
-  return `<div class="lockwrap"><div class="lockcard"><div class="logo">AMANAT</div><h2>${forced?"Придумайте ПИН-код":"Новый ПИН-код"}</h2><p class="small muted" style="margin:0">${forced?"Администратор включил вход по ПИН-коду.":""} 4–6 цифр.</p>
+  return `<div class="lockwrap"><div class="lockcard"><div class="logo">${LOGO_BIG}</div><h2>${forced?"Придумайте ПИН-код":"Новый ПИН-код"}</h2><p class="small muted" style="margin:0">${forced?"Администратор включил вход по ПИН-коду.":""} 4–6 цифр.</p>
   <input id="pin1" class="pinin" type="password" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="ПИН" aria-label="ПИН-код">
   <input id="pin2" class="pinin" style="margin-top:0" type="password" inputmode="numeric" autocomplete="off" maxlength="6" placeholder="ещё раз" aria-label="Повторите ПИН-код">
   <div class="pinerr" id="pinerr"></div>
@@ -966,7 +989,7 @@ function vAccess(){
     <dt><b>Просмотр</b></dt><dd style="text-align:left">только смотрит, как менеджер</dd>
     <dt><b>Нет доступа</b></dt><dd style="text-align:left">видит только экран «Доступ закрыт»</dd></dl></section></div>`;
   if(isFull()){const cp=comp();
-    h+=`<div class="grid2" style="margin-top:22px"><section class="panel"><div class="head" style="margin-bottom:8px"><h3 style="margin:0">Реквизиты AMANAT</h3>${W(`<button class="btn sm" data-a="company">Изменить</button>`)}</div>
+    h+=`<div class="grid2" style="margin-top:22px"><section class="panel"><div class="head" style="margin-bottom:8px"><h3 style="margin:0">Реквизиты AMANA</h3>${W(`<button class="btn sm" data-a="company">Изменить</button>`)}</div>
       ${cp.name?`<dl class="kv"><dt>Продавец</dt><dd>${esc(cp.name)}</dd>${cp.inn?`<dt>ИНН</dt><dd>${esc(cp.inn)}</dd>`:""}${cp.city?`<dt>Город</dt><dd>${esc(cp.city)}</dd>`:""}${cp.phone?`<dt>Телефон</dt><dd>${esc(cp.phone)}</dd>`:""}</dl>`:`<p class="small muted" style="margin:0">Заполните реквизиты — они подставляются в договоры и квитанции.</p>`}</section>
       <section class="panel"><h3>Резервные копии</h3><p class="small muted" style="margin-top:0">Последняя копия: <b>${cp.lastBackup?fmtD(cp.lastBackup):"ещё не делалась"}</b>. Делайте копию раз в месяц и храните у себя.</p>
       <div class="row-actions"><button class="btn pri" data-a="export">Excel (все таблицы)</button><button class="btn" data-a="backup-json">Полная копия с фото (JSON)</button></div>
@@ -1031,7 +1054,7 @@ function vCalc(){
   const pm=Math.max(500000,s.price);
   return `<div class="cols calcgrid">
   <section class="cc">
-    <div class="lg"><div class="mark">A</div><div class="nm">AMANAT</div></div>
+    <div class="lg"><svg class="lmark inv" viewBox="0 0 200 200" width="40" height="40" aria-hidden="true"><rect width="200" height="200" rx="40" fill="#D9AE55"/><path d="M54 156V96C54 66 78 47 100 34C122 47 146 66 146 96V156" fill="none" stroke="#D9AE55" stroke-width="12" stroke-linejoin="round"/><path d="M40 156H160" stroke="#D9AE55" stroke-width="12" stroke-linecap="round"/><circle cx="100" cy="98" r="15" fill="#D9AE55"/><path d="M92 106L86 136H114L108 106Z" fill="#D9AE55"/></svg><span class="nm"><svg class="lword" viewBox="-6 0 392 80" height="17" style="width:auto;overflow:hidden" role="img" aria-label="AMANA"><g fill="none" stroke="currentColor" stroke-width="11" stroke-miterlimit="10"><path d="M-2 86L30-4L62 86M13 54H47M80 86V0L110 54L140 0V86M158 86L190-4L222 86M173 54H207M240 86V0L300 80M300 86V-6M318 86L350-4L382 86M333 54H367"/></g></svg></span></div>
     <h2>Калькулятор рассрочки</h2><div class="sub">Без процентов и штрафов — цена фиксируется в договоре</div>
     <div class="cf"><label for="c_price">Стоимость товара или услуги</label><div class="cbox"><input id="c_price" data-calc="price" inputmode="numeric" value="${s.price}"><span>₽</span></div><input type="range" data-calc="price" min="0" max="${pm}" step="1000" value="${s.price}" aria-label="Стоимость"></div>
     <div class="cf"><label for="c_down">Первоначальный взнос</label><div class="cbox"><input id="c_down" data-calc="down" inputmode="numeric" value="${s.down}"><span>₽</span></div><input type="range" data-calc="down" min="0" max="${s.price}" step="1000" value="${Math.min(s.down,s.price)}" aria-label="Первоначальный взнос"></div>
@@ -1054,7 +1077,7 @@ function updateCalc(){
   $("#cdetail").innerHTML=r.fin>0?`<dl class="kv"><dt>Стоимость</dt><dd>${rub(r.price)}</dd><dt>Первый взнос</dt><dd>${rub(r.down)}</dd><dt>Сумма в рассрочку</dt><dd>${rub(r.fin)}</dd><dt>Наценка</dt><dd>${rub(r.markup)}</dd><div class="sep"></div><dt class="strong">Общая стоимость</dt><dd class="strong">${rub(r.total)}</dd></dl>
     <div class="tw keep" style="margin-top:12px"><table><thead><tr><th>№</th><th>Примерная дата</th><th class="n">Сумма</th></tr></thead><tbody>${Array.from({length:r.n},(_,i)=>`<tr><td>${i+1}</td><td>${fmtD(addMonths(today,i+1))}</td><td class="n">${rub(i===r.n-1?r.last:r.monthly)}</td></tr>`).join("")}</tbody></table></div>`:`<p class="muted small">Нет суммы для рассрочки.</p>`;
 }
-function calcText(){const r=calcResult();return `Расчёт рассрочки AMANAT\nСтоимость: ${rub(r.price)}\nПервый взнос: ${rub(r.down)}\nСрок: ${r.n} мес.\nЕжемесячный платёж: ${rub(r.monthly)}${r.last!==r.monthly?" (последний "+rub(r.last)+")":""}\nОбщая стоимость: ${rub(r.total)}\nБез процентов и штрафов — цена фиксируется в договоре.`.replace(/[\u00a0\u202f]/g," ")}
+function calcText(){const r=calcResult();return `Расчёт рассрочки AMANA\nСтоимость: ${rub(r.price)}\nПервый взнос: ${rub(r.down)}\nСрок: ${r.n} мес.\nЕжемесячный платёж: ${rub(r.monthly)}${r.last!==r.monthly?" (последний "+rub(r.last)+")":""}\nОбщая стоимость: ${rub(r.total)}\nБез процентов и штрафов — цена фиксируется в договоре.`.replace(/[\u00a0\u202f]/g," ")}
 
 
 /* ---------- calculation as image ---------- */
@@ -1069,9 +1092,13 @@ function drawCalcImage(){
   c.strokeStyle="rgba(217,174,85,.14)";c.lineWidth=70;c.beginPath();c.arc(W-40,40,230,0,Math.PI*2);c.stroke();
   c.strokeStyle="rgba(217,174,85,.08)";c.lineWidth=40;c.beginPath();c.arc(60,H-30,200,0,Math.PI*2);c.stroke();
   // brand
-  c.fillStyle="#D9AE55";rr(c,70,70,92,92,24);c.fill();
-  c.fillStyle="#0A403B";c.font=`700 52px ${D}`;c.textAlign="center";c.textBaseline="middle";c.fillText("A",116,118);
-  c.textAlign="left";c.fillStyle="#fff";c.font=`700 42px ${D}`;c.fillText("AMANAT",186,104);
+  c.save();c.translate(70,70);c.scale(.46,.46);c.fillStyle="#D9AE55";rr(c,0,0,200,200,46);c.fill();
+  c.strokeStyle="#0A403B";c.fillStyle="#0A403B";c.lineWidth=12;c.lineJoin="round";c.lineCap="round";
+  c.stroke(new Path2D("M54 156V96C54 66 78 47 100 34C122 47 146 66 146 96V156"));c.stroke(new Path2D("M40 156H160"));
+  c.beginPath();c.arc(100,98,15,0,Math.PI*2);c.fill();c.fill(new Path2D("M92 106L86 136H114L108 106Z"));c.restore();
+  c.save();c.translate(190,78);c.scale(.5,.5);c.beginPath();c.rect(-10,0,410,80);c.clip();c.strokeStyle="#fff";c.lineWidth=11;c.lineJoin="miter";c.miterLimit=10;c.lineCap="butt";
+  c.stroke(new Path2D("M-2 86L30-4L62 86M13 54H47M80 86V0L110 54L140 0V86M158 86L190-4L222 86M173 54H207M240 86V0L300 80M300 86V-6M318 86L350-4L382 86M333 54H367"));c.restore();
+  c.textAlign="left";c.textBaseline="middle";
   c.fillStyle="rgba(255,255,255,.7)";c.font=`400 26px ${T}`;c.fillText("честная рассрочка",188,146);
   // title
   c.textBaseline="alphabetic";c.fillStyle="#fff";c.font=`700 64px ${D}`;c.fillText("Расчёт рассрочки",70,282);
@@ -1112,11 +1139,51 @@ async function shareCalc(){
   if(saveBlob(name,blob))toast("Картинка сохранена — отправьте её клиенту из галереи");
 }
 
+
+/* ---------- applications (заявки) ---------- */
+let APPS=[],appsSub=false,appsLoaded=false;
+const appsNew=()=>APPS.filter(a=>a.status==="new").length;
+const APP_ST={new:["Новая","mid"],work:["В работе","act"],approved:["Одобрена","ok"],rejected:["Отказ","gray"]};
+async function loadApps(){
+  if(!SB)return;const {data,error}=await SB.from("applications").select("*").order("created_at",{ascending:false}).limit(500);
+  if(error||!data)return;
+  const known=new Set(APPS.map(a=>a.id));const fresh=appsLoaded?data.filter(a=>!known.has(a.id)&&a.status==="new"):[];
+  APPS=data;appsLoaded=true;if(fresh.length)toast("Новая заявка: "+fresh[0].name);render();
+}
+function appLink(){const u=location.href.split("#")[0].split("?")[0];return u.replace(/[^/]*$/,"")+"zayavka.html"}
+function fmtDT(iso){try{return new Date(iso).toLocaleString("ru-RU",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"})}catch(e){return ""}}
+function appCard(a){
+  const st=APP_ST[a.status]||APP_ST.new;const ph=phoneDigits(a.phone);
+  const prod=/^https?:\/\//i.test(a.product)?`<a href="${esc(a.product)}" target="_blank" rel="noopener noreferrer">${esc(a.product.length>48?a.product.slice(0,48)+"…":a.product)}</a>`:esc(a.product);
+  const wa=ph?`<a class="btn sm" target="_blank" rel="noopener" href="https://wa.me/${ph}?text=${encodeURIComponent(`Ассаляму алейкум, ${a.name}! Это AMANA, вы оставили заявку на рассрочку: ${a.product}. Удобно сейчас обсудить?`)}">WhatsApp</a>`:"";
+  return `<article class="panel app st-${a.status}">
+    <div class="ah"><div><div class="t">${esc(a.name)}</div><div class="muted small">${fmtDT(a.created_at)}${a.city?", "+esc(a.city):""}</div></div><span class="tag ${st[1]}">${st[0]}</span></div>
+    <dl class="kv"><dt>Телефон</dt><dd><a href="tel:+${ph}">${esc(a.phone)}</a></dd><dt>Товар</dt><dd>${prod}</dd>
+    ${a.price?`<dt>Стоимость</dt><dd>${rub(num(a.price))}</dd>`:""}${a.months?`<dt>Взнос и срок</dt><dd>${rub(num(a.down))}, ${a.months} мес.</dd><dt>Платёж</dt><dd class="strong">${rub(num(a.monthly))}</dd>`:""}
+    ${a.comment?`<dt>Комментарий</dt><dd>${esc(a.comment)}</dd>`:""}</dl>
+    ${a.photo&&/^data:image\//.test(a.photo)?`<img class="pimg" src="${esc(a.photo)}" alt="Фото товара" data-zoomsrc="1">`:""}
+    <input class="anote" data-appnote="${a.id}" value="${esc(a.note||"")}" placeholder="Заметка: о чём договорились" aria-label="Заметка">
+    <div class="acts">${wa}<select data-appstatus="${a.id}" aria-label="Статус">${Object.entries(APP_ST).map(([k,[l]])=>`<option value="${k}" ${a.status===k?"selected":""}>${l}</option>`).join("")}</select>
+    ${a.client_id&&byId("clients",a.client_id)?`<button class="btn sm" data-a="client" data-id="${esc(a.client_id)}">Карточка клиента</button>`:`<button class="btn sm pri" data-a="app-client" data-id="${a.id}">Создать клиента</button>`}
+    ${D(`<button class="btn sm dng" data-a="del-app" data-id="${a.id}" style="margin-left:auto">Удалить</button>`)}</div>
+  </article>`;
+}
+function vApps(){
+  const f=ui.appFilter||"new";const cnt=k=>APPS.filter(a=>k==="all"||a.status===k).length;
+  const chips=[["new","Новые"],["work","В работе"],["approved","Одобрены"],["rejected","Отказ"],["all","Все"]];
+  const list=APPS.filter(a=>f==="all"||a.status===f);
+  return `<div class="head"><h2>Заявки</h2><div class="filters">${chips.map(([k,l])=>`<button class="chip" data-a="app-filter" data-v="${k}" aria-pressed="${f===k}">${l} ${cnt(k)}</button>`).join("")}</div></div>
+  <section class="panel" style="margin-bottom:16px"><h3 style="margin-top:0">Страница заявок для клиентов</h3><p class="small muted" style="margin:0 0 10px">Поставьте ссылку в шапку Instagram или отправляйте клиентам: там калькулятор и форма заявки.</p>
+    <div class="linkbox"><code>${esc(appLink())}</code><button class="btn sm" data-a="app-copy">Скопировать</button><a class="btn sm" href="${esc(appLink())}" target="_blank" rel="noopener">Открыть</a></div></section>
+  ${!appsLoaded?`<div class="empty">Загружаю заявки…</div>`:list.length?`<div class="applist">${list.map(appCard).join("")}</div>`:`<div class="empty">${f==="new"?"Новых заявок нет. Отправьте клиентам ссылку выше.":"Здесь пока пусто."}</div>`}`;
+}
+async function appUpdate(id,patch,msg){const {error}=await SB.from("applications").update({...patch,handled_by:ME.id}).eq("id",id);if(error){toast("Не удалось сохранить");return false}const a=APPS.find(x=>x.id===id);if(a)Object.assign(a,patch);if(msg)toast(msg);render();return true}
+
 /* ---------- company ---------- */
 function mCompany(){
   const c=comp();
-  openModal("Реквизиты AMANAT",`<div class="form">
-    ${field("name","Продавец (как в договоре)",{value:c.name,req:1,full:1,ph:"ИП Иванов Иван Иванович (AMANAT)"})}
+  openModal("Реквизиты AMANA",`<div class="form">
+    ${field("name","Продавец (как в договоре)",{value:c.name,req:1,full:1,ph:"ИП Иванов Иван Иванович (AMANA)"})}
     ${field("signer","В лице",{value:c.signer,full:1,ph:"Иванова Ивана Ивановича, действующего на основании свидетельства"})}
     ${field("inn","ИНН",{value:c.inn})}${field("ogrn","ОГРН / ОГРНИП",{value:c.ogrn})}
     ${field("address","Адрес",{value:c.address,full:1})}
@@ -1248,7 +1315,7 @@ function contractPDF(id){
   doc.table([{t:"№",w:30,a:"c"},{t:"Дата платежа",w:90},{t:"Назначение",w:150},{t:"Сумма",w:90,a:"r"},{t:"Отметка об оплате",w:130}],rows,{size:9.5});
   doc.text("Проценты, пени и штрафы за просрочку не начисляются.",{size:9,gap:14});
   sigs();
-  savePdf(doc.bytes("AMANAT · договор "+d.code),`Договор_${d.code}_${(cl.name||"").replace(/\s+/g,"_")}.pdf`);
+  savePdf(doc.bytes("AMANA · договор "+d.code),`Договор_${d.code}_${(cl.name||"").replace(/\s+/g,"_")}.pdf`);
   logIt("Создал","deals","Договор PDF по сделке "+d.code);
 }
 function receiptPDF(pid){
@@ -1256,7 +1323,7 @@ function receiptPDF(pid){
   const upto=c.pays.filter(x=>(x.date||"")<(pay.date||"")||((x.date||"")===(pay.date||"")&&(x.code||"")<=(pay.code||""))).reduce((s,x)=>s+num(x.amount),0);
   const left=Math.max(0,c.price-c.down-upto-c.waived);
   const doc=new PDF();
-  doc.text(co.name||"AMANAT",{size:11,bold:true,gap:0});doc.text([co.address,co.phone&&"Тел. "+co.phone,co.inn&&"ИНН "+co.inn].filter(Boolean).join(" · "),{size:8.5,color:"0.4 0.45 0.45",gap:16});
+  doc.text(co.name||"AMANA",{size:11,bold:true,gap:0});doc.text([co.address,co.phone&&"Тел. "+co.phone,co.inn&&"ИНН "+co.inn].filter(Boolean).join(" · "),{size:8.5,color:"0.4 0.45 0.45",gap:16});
   doc.text(`КВИТАНЦИЯ № ${pay.code}`,{size:15,bold:true,align:"center",gap:0});
   doc.text("об оплате по договору рассрочки",{size:10,align:"center",gap:16});
   doc.table([{t:"",w:180},{t:"",w:320}],[
@@ -1266,7 +1333,7 @@ function receiptPDF(pid){
   ],{size:10,noHeader:true});
   doc.gap(20);doc.two(["Принял",pay.who||"","","____________ / ____________ /"],["Плательщик",cl.name||"","","____________ / ____________ /"]);
   doc.gap(10);doc.text("Проценты, пени и штрафы за просрочку не начисляются. БаракаЛлаху фикум!",{size:8.5,color:"0.4 0.45 0.45",align:"center"});
-  savePdf(doc.bytes("AMANAT · квитанция "+pay.code),`Квитанция_${pay.code}_${(cl.name||"").replace(/\s+/g,"_")}.pdf`);
+  savePdf(doc.bytes("AMANA · квитанция "+pay.code),`Квитанция_${pay.code}_${(cl.name||"").replace(/\s+/g,"_")}.pdf`);
 }
 
 /* ---------- early payoff (ibra) ---------- */
@@ -1309,7 +1376,7 @@ function distributionHTML(R){
   const rest=partners.length&&base>0?base-partners.reduce((s,p)=>s+Math.round(base*num(p.share)/100),0):0;
   return `<section class="panel" style="margin-top:22px"><h3>Распределение прибыли за ${esc(label)}</h3>
     <dl class="kv" style="margin-bottom:10px"><dt>Наценка в полученных деньгах</dt><dd>${rub(R.realized)}</dd><dt>Расходы</dt><dd>− ${rub(R.exp)}</dd><div class="sep"></div><dt class="strong">Прибыль к распределению</dt><dd class="strong" style="${base<0?"color:var(--danger)":""}">${rub(base)}</dd></dl>
-    ${partners.length?`<div class="tw"><table><thead><tr><th>Партнёр</th><th class="n">Доля</th><th class="n">${base<0?"Убыток":"Причитается"}</th><th class="n">Выплачено</th><th></th></tr></thead><tbody>${rows}${rest>0?`<tr><td class="muted">Остаётся в AMANAT</td><td></td><td class="n">${rub(rest)}</td><td></td><td></td></tr>`:""}</tbody></table></div>
+    ${partners.length?`<div class="tw"><table><thead><tr><th>Партнёр</th><th class="n">Доля</th><th class="n">${base<0?"Убыток":"Причитается"}</th><th class="n">Выплачено</th><th></th></tr></thead><tbody>${rows}${rest>0?`<tr><td class="muted">Остаётся в AMANA</td><td></td><td class="n">${rub(rest)}</td><td></td><td></td></tr>`:""}</tbody></table></div>
       <p class="small muted">Делится только реально полученная прибыль. ${base<0?"Убыток по правилам мушараки распределяется пропорционально вложенному капиталу, а не долям прибыли.":""}</p>`
     :`<p class="small muted" style="margin:0">Партнёров с долей в прибыли нет. ${loanOnly.length?"Сейчас все партнёры дали займы — им возвращается ровно та же сумма, прибыль им не положена.":""} Если кто-то вкладывает деньги за долю, отметьте это в его карточке во вкладке «Займы и партнёры».</p>`}
   </section>`;
@@ -1366,7 +1433,7 @@ function vZakat(){
   ${paid.length?`<section class="panel"><h3>Выплаченный закят</h3><dl class="kv">${paid.map(x=>`<dt>${fmtD(x.date)}</dt><dd>${rub(num(x.amount))}</dd>`).join("")}</dl></section>`:""}
   </div></div>`;
 }
-function mZakatPay(v){openModal("Выплата закята",`<div class="form">${field("amount","Сумма, ₽",{type:"number",value:v,req:1})}${field("date","Дата",{type:"date",value:todayISO(),req:1})}${field("desc","Комментарий",{value:"Выплата закята",full:1})}<div class="note">Сумма спишется из кассы AMANAT.</div></div>`,`<button class="btn" data-a="close">Отмена</button><button class="btn pri" data-a="save-zakat-pay">Записать</button>`)}
+function mZakatPay(v){openModal("Выплата закята",`<div class="form">${field("amount","Сумма, ₽",{type:"number",value:v,req:1})}${field("date","Дата",{type:"date",value:todayISO(),req:1})}${field("desc","Комментарий",{value:"Выплата закята",full:1})}<div class="note">Сумма спишется из кассы AMANA.</div></div>`,`<button class="btn" data-a="close">Отмена</button><button class="btn pri" data-a="save-zakat-pay">Записать</button>`)}
 async function saveZakatPay(){const o=formData();if(!need(o,[["amount","Сумма"],["date","Дата"]]))return;if(await save("cash",null,{dir:"out",kind:"zakat",amount:num(o.amount),date:o.date,desc:o.desc||"Выплата закята"})){closeModal();toast("Выплата закята записана")}}
 
 /* ---------- backups ---------- */
@@ -1375,8 +1442,8 @@ function backupBanner(){if(!isFull()||offline||!S.deals.length)return "";const d
   return `<div class="banner" style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><span>${d===null?"Резервная копия базы ещё ни разу не делалась.":"Последняя резервная копия была "+d+" дн. назад."} Сохраните копию себе — это займёт минуту.</span><button class="btn sm pri" data-a="export">Скачать копию (Excel)</button></div>`}
 async function markBackup(){if(!db||!isFull())return;const c=comp();try{await db.collection("company").doc("main").set({...strip(c),lastBackup:todayISO()})}catch(e){}}
 function backupJSON(){
-  const data={app:"AMANAT",exportedAt:new Date().toISOString(),data:Object.fromEntries(COLS.map(c=>[c,S[c]])),log:LOG};
-  const name="AMANAT_полная_копия_"+todayISO()+".json";const blob=new Blob([JSON.stringify(data,null,1)],{type:"application/json"});
+  const data={app:"AMANA",exportedAt:new Date().toISOString(),data:Object.fromEntries(COLS.map(c=>[c,S[c]])),log:LOG};
+  const name="AMANA_полная_копия_"+todayISO()+".json";const blob=new Blob([JSON.stringify(data,null,1)],{type:"application/json"});
   if(saveBlob(name,blob)){toast("Копия сохранена");markBackup();logIt("Создал","backup","Полная резервная копия (JSON)")}
 }
 
@@ -1481,7 +1548,7 @@ function vReports(){
 function exportPeriod(){
   if(!window.XLSX){toast("Модуль Excel не загрузился");return}
   const R=periodReport(ui.from,ui.to); const wb=XLSX.utils.book_new();
-  const sum=[["AMANAT — отчёт",periodTitle(ui.from,ui.to)],["Период",fmtD(ui.from)+" — "+fmtD(ui.to)],[],
+  const sum=[["AMANA — отчёт",periodTitle(ui.from,ui.to)],["Период",fmtD(ui.from)+" — "+fmtD(ui.to)],[],
     ["Оформлено сделок",R.deals.length],["Продано на сумму",R.sales],["Себестоимость",R.cost],["Наценка по новым сделкам",R.markup],["Расходы",R.exp],["Прибыль по сделкам",R.markup-R.exp],[],
     ["Поступило от клиентов",R.received],["Наценка в полученных деньгах",Math.round(R.realized)],["По графику ожидалось",R.due],["Из них внесено",R.dueGot],[],
     ["Касса на начало",R.cashStart],["Пришло",R.cashIn],["Ушло",R.cashOut],["Касса на конец",R.cashEnd],["Закупка товара",R.buy],["Получено займов",R.loanIn],["Возвращено займов",R.loanOut]];
@@ -1490,7 +1557,7 @@ function exportPeriod(){
   add("Поступления",R.pays.map(p=>({"Дата":fmtD(p.date),"№":p.code,"Клиент":p.client?p.client.name:"","Сделка":p.deal.code,"Сумма":p.amount,"Способ":p.method,"Принял":p.who})));
   add("Сделки",R.deals.map(({d,c})=>({"Дата":fmtD(d.date),"№":d.code,"Клиент":c.client?c.client.name:"","Товар":c.product?[c.product.name,c.product.model].join(" "):"","Себестоимость":c.cost,"Цена":c.price,"Наценка":c.markup})));
   add("Расходы",R.exps.map(e=>({"Дата":fmtD(e.date),"Категория":e.category,"Описание":e.desc||"","Сумма":num(e.amount),"Кто оплатил":e.who||""})));
-  const out=XLSX.write(wb,{bookType:"xlsx",type:"array"}); const name="AMANAT_отчёт_"+ui.from+"_"+ui.to+".xlsx";
+  const out=XLSX.write(wb,{bookType:"xlsx",type:"array"}); const name="AMANA_отчёт_"+ui.from+"_"+ui.to+".xlsx";
   if(downloads){downloads.save({filename:name,data:out}).then(()=>toast("Отчёт сохранён")).catch(e=>{if(e&&e.code!=="declined")toast("Не удалось сохранить файл")})}
   else{if(saveBlob(name,new Blob([out],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"})))toast("Отчёт сохранён")}
 }
@@ -1510,7 +1577,7 @@ function exportXlsx(isBackup){
   add("Партнёры",S.partners.map(p=>({"Имя":p.name,"Телефон":p.phone||"","Роль":p.role||"","Участие":p.kind==="partner"?"Доля в прибыли":"Займ","Доля, %":num(p.share)})));
   add("Выплаты прибыли",S.payouts.map(p=>({"Дата":fmtD(p.date),"Партнёр":partnerName(p.partnerId),"Период":p.label||"","Сумма":num(p.amount)})));
   if(isFull())add("Журнал",[...LOG].sort((a,b)=>(b.at||"").localeCompare(a.at||"")).map(l=>({"Когда":(l.at||"").replace("T"," ").slice(0,16),"Кто":who(l.uid),"Действие":l.act,"Что":l.text})));
-  const out=XLSX.write(wb,{bookType:"xlsx",type:"array"}); const name="AMANAT_"+todayISO()+".xlsx";
+  const out=XLSX.write(wb,{bookType:"xlsx",type:"array"}); const name="AMANA_"+todayISO()+".xlsx";
   if(downloads){downloads.save({filename:name,data:out}).then(()=>{toast("Файл сохранён");if(isBackup)markBackup()}).catch(e=>{if(e&&e.code!=="declined")toast("Не удалось сохранить файл")})}
   else{if(saveBlob(name,new Blob([out],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}))){toast("Файл сохранён");if(isBackup)markBackup()}}
 }
@@ -1527,6 +1594,14 @@ document.addEventListener("click",async e=>{
   }
   switch(a){
     case "close":closeModal();break;
+    case "app-filter":ui.appFilter=t.dataset.v;draw();break;
+    case "app-copy":{const u=appLink();(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>toast("Ссылка скопирована")).catch(()=>toast(u))}break;
+    case "app-client":{const ap=APPS.find(x=>x.id===id);if(!ap)break;const cid=crypto.randomUUID?crypto.randomUUID():"c"+Date.now().toString(36);
+      const note=["Из заявки: "+ap.product,ap.comment,ap.months?`Расчёт: ${rub(num(ap.price))}, взнос ${rub(num(ap.down))}, ${ap.months} мес. по ${rub(num(ap.monthly))}`:""].filter(Boolean).join(". ");
+      if(await save("clients",cid,{code:nextCode("clients","А",1),date:todayISO(),name:ap.name,phone:ap.phone,city:ap.city||"",note})){
+        await appUpdate(ap.id,{client_id:cid,status:ap.status==="new"?"work":ap.status},"Клиент создан");
+        let tries=0;const op=()=>{if(byId("clients",cid))mClient(cid);else if(++tries<20)setTimeout(op,150)};op()}}break;
+    case "del-app":{const ap=APPS.find(x=>x.id===id);const {error}=await SB.from("applications").delete().eq("id",id);if(error){toast("Не удалось удалить");break}APPS=APPS.filter(x=>x.id!==id);logIt("Удалил","applications","Заявка: "+(ap?ap.name+", "+ap.product:""));toast("Заявка удалена");render()}break;
     case "calc-deal":{const r=calcResult();mNewDeal(null);setTimeout(()=>{if(!dlg.querySelector("[name=price]"))return;const set=(n,v)=>{const x=dlg.querySelector(`[name=${n}]`);if(x)x.value=v};const sel=dlg.querySelector("[name=productId]");if(sel){const m=S.products.find(p=>!productStatus(p).sold&&num(p.cost)===r.price);if(m)sel.value=m.id}set("down",r.down);set("count",r.n);set("period","month");const p=sel&&byId("products",sel.value);const cost=p?num(p.cost):r.price;set("price",cost+r.markup+(cost!==r.price?0:0));set("markup",cost+r.markup-cost);dealCalcPreview("markup")},30)}break;
     case "calc-share":shareCalc();break;
     case "calc-copy":{const tx=calcText();(navigator.clipboard?navigator.clipboard.writeText(tx):Promise.reject()).then(()=>toast("Расчёт скопирован")).catch(()=>{const ta=document.createElement("textarea");ta.value=tx;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");toast("Расчёт скопирован")}catch(_){toast("Не удалось скопировать")}ta.remove()})}break;
@@ -1603,6 +1678,7 @@ dlg.addEventListener("input",e=>{const n=e.target.name;if(!n)return;
   if($("#paycalc")&&["amount","dealId"].includes(n))payPreview(n==="dealId");});
 dlg.addEventListener("change",e=>{const n=e.target.name;if($("#calc")&&["productId","period"].includes(n))dealCalcPreview(n);if($("#paycalc")&&n==="dealId")payPreview(true)});
 dlg.addEventListener("click",e=>{const z=e.target.closest("[data-zoom]");if(z){const p=byId("photos",z.dataset.zoom);if(!p)return;const lb=document.createElement("div");lb.className="lightbox";const im=document.createElement("img");im.src=p.data;im.alt="";lb.appendChild(im);lb.addEventListener("click",ev=>{ev.stopPropagation();lb.remove()});dlg.appendChild(lb)}});
+document.addEventListener("click",e=>{const z=e.target.closest&&e.target.closest("#app [data-zoomsrc]");if(!z)return;const lb=document.createElement("div");lb.className="lightbox";const im=document.createElement("img");im.src=z.src;im.alt="";lb.appendChild(im);lb.addEventListener("click",()=>lb.remove());document.body.appendChild(lb)});
 dlg.addEventListener("change",e=>{const f=e.target.closest("[data-upload]");if(f&&f.files&&f.files.length){uploadPhotos(f.dataset.upload,[...f.files]);f.value=""}});
 document.addEventListener("change",e=>{if(e.target.id==="pFrom"||e.target.id==="pTo"){const v=e.target.value;if(!v)return;if(e.target.id==="pFrom")ui.from=v;else ui.to=v;if(ui.from>ui.to){const x=ui.from;ui.from=ui.to;ui.to=x}ui.preset="";draw()}});
 document.addEventListener("change",e=>{if(e.target.closest&&e.target.closest("#zkForm")){ui.zk=readZakatInputs();draw()}});
@@ -1613,6 +1689,8 @@ document.addEventListener("change",async e=>{const t=e.target;
   if(t.dataset.role){const id=t.dataset.role;if(t.value==="pending")return;const {error}=await SB.from("profiles").update({role:t.value}).eq("id",id);if(error)toast("Не удалось сохранить роль");else{logIt("Изменил","settings",`Роль: ${who(id)} — ${ROLES[t.value]}`);toast("Роль сохранена");loadProfiles()}}
   if(t.dataset.label!==undefined){const id=t.dataset.label;const {error}=await SB.from("profiles").update({label:t.value.trim()}).eq("id",id);if(error)toast("Не удалось сохранить подпись");else{toast("Подпись сохранена");loadProfiles()}}
   if(t.id==="importFile"&&t.files&&t.files[0]){importJSON(t.files[0]);t.value=""}
+  if(t.dataset.appstatus){const ap=APPS.find(x=>x.id===t.dataset.appstatus);if(await appUpdate(t.dataset.appstatus,{status:t.value},"Статус: "+APP_ST[t.value][0].toLowerCase()))logIt("Изменил","applications",`Заявка ${ap?ap.name:""}: ${APP_ST[t.value][0]}`)}
+  if(t.dataset.appnote){appUpdate(t.dataset.appnote,{note:t.value.trim().slice(0,1000)},"Заметка сохранена")}
 });
 document.addEventListener("input",e=>{const k=e.target.dataset&&e.target.dataset.calc;if(!k)return;const s=calcState();
   let v=Math.round(num(String(e.target.value).replace(/\D/g,"")));if(k==="months")v=Math.min(120,Math.max(1,v||1));
@@ -1656,7 +1734,7 @@ userCap={profiles:async ids=>Object.fromEntries([].concat(ids).map(id=>[id,{id,n
 /* ---------- login ---------- */
 function loginView(){
   const up=ui.authMode==="up";
-  return `<div class="lockwrap"><div class="lockcard" style="text-align:left"><div class="logo" style="text-align:center">AMANAT</div><h2 style="text-align:center">${up?"Регистрация":"Вход"}</h2>
+  return `<div class="lockwrap"><div class="lockcard" style="text-align:left"><div class="logo" style="text-align:center">${LOGO_BIG}</div><h2 style="text-align:center">${up?"Регистрация":"Вход"}</h2>
   <div class="f" style="margin-top:14px"><label>Email</label><input id="lgEmail" type="email" autocomplete="username" style="border:1px solid var(--line);background:var(--surface-2);border-radius:8px;padding:10px 12px"></div>
   <div class="f" style="margin-top:10px"><label>Пароль${up?" (не короче 8 символов)":""}</label><input id="lgPass" type="password" autocomplete="${up?"new-password":"current-password"}" style="border:1px solid var(--line);background:var(--surface-2);border-radius:8px;padding:10px 12px"></div>
   <div class="pinerr" id="pinerr" style="margin-top:8px"></div>
@@ -1675,7 +1753,7 @@ async function doLogin(up){
 }
 async function importJSON(file){
   try{
-    const j=JSON.parse(await file.text());const data=j&&j.data;if(!data||j.app!=="AMANAT")return toast("Это не копия AMANAT");
+    const j=JSON.parse(await file.text());const data=j&&j.data;if(!data||(j.app!=="AMANA"&&j.app!=="AMAN"+"AT"))return toast("Это не копия AMANA");
     const rows=[];for(const col of COLS){(data[col]||[]).forEach(r=>{const {id,...rest}=r;if(id)rows.push({col,id:String(id),data:rest})})}
     if(!rows.length)return toast("В копии нет данных");
     toast("Загружаю "+rows.length+" записей…");
@@ -1690,7 +1768,7 @@ const _gate=gateView;
 gateView=function(){if(SB&&!SESSION)return loginView();return _gate()};
 draw();
 (async()=>{
-  if(!window.supabase||!CFG.SUPABASE_URL||/ВАШ/.test(CFG.SUPABASE_URL+CFG.SUPABASE_ANON_KEY)){offline=true;$("#app").innerHTML=`<div class="lockwrap"><div class="lockcard"><div class="logo">AMANAT</div><h2>Нужна настройка</h2><p class="muted">Откройте файл index.html и вставьте адрес и ключ своего проекта Supabase в блок «НАСТРОЙКИ» в начале файла.</p></div></div>`;return}
+  if(!window.supabase||!CFG.SUPABASE_URL||/ВАШ/.test(CFG.SUPABASE_URL+CFG.SUPABASE_ANON_KEY)){offline=true;$("#app").innerHTML=`<div class="lockwrap"><div class="lockcard"><div class="logo">${LOGO_BIG}</div><h2>Нужна настройка</h2><p class="muted">Откройте файл index.html и вставьте адрес и ключ своего проекта Supabase в блок «НАСТРОЙКИ» в начале файла.</p></div></div>`;return}
   SB=window.supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_ANON_KEY);
   const {data:{session}}=await SB.auth.getSession();SESSION=session;
   if(!session){gateReady=true;draw();return}
@@ -1712,6 +1790,8 @@ draw();
   const subData=()=>{if(subbed||["pending","blocked"].includes(role()))return;subbed=true;
     COLS.forEach(col=>{db.collection(col).onSnapshot(snap=>{S[col]=snap.docs.map(d=>({id:d.id,...d.data()}));loaded.add(col);render();if(col==="photos"&&dlg.dataset.client)refreshPhotos()},()=>{})})};
   subData(); setInterval(subData,3000);
+  const subApps=()=>{if(appsSub||!canAdd())return;appsSub=true;loadApps();SB.channel("apps-all").on("postgres_changes",{event:"*",schema:"public",table:"applications"},()=>loadApps()).subscribe();setInterval(loadApps,60000)};
+  subApps(); setInterval(subApps,3000);
 })();
 })();
 </script>

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AMANA — рассрочка без процентов</title>
+<meta name="description" content="Рассчитайте рассрочку и оставьте заявку. Без процентов и штрафов — цена фиксируется в договоре.">
+<meta name="theme-color" content="#0A403B">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' rx='46' fill='%230A403B'/%3E%3Cpath d='M54 156V96C54 66 78 47 100 34C122 47 146 66 146 96V156' fill='none' stroke='%23D9AE55' stroke-width='12' stroke-linejoin='round'/%3E%3Cpath d='M40 156H160' stroke='%23D9AE55' stroke-width='12' stroke-linecap='round'/%3E%3Ccircle cx='100' cy='98' r='15' fill='%23D9AE55'/%3E%3Cpath d='M92 106L86 136H114L108 106Z' fill='%23D9AE55'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--teal:#0E5B53;--deep:#0A403B;--night:#082F2B;--brass:#D9AE55;--brass-ink:#7A5713;--sand:#F4EAD3;--ink:#0F2A2A;--ink2:#4A5D5F;--line:#DCE4E2;--bg:#EEF2F0;--err:#B42318;
+  --D:"Unbounded","Golos Text",system-ui,sans-serif;--T:"Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--T);padding-bottom:env(safe-area-inset-bottom,0px)}
+a{color:inherit}
+.wrap{max-width:560px;margin:0 auto;padding:0 16px}
+header{background:var(--night);color:#fff;padding:calc(14px + env(safe-area-inset-top,0px)) 0 14px}
+header .wrap{display:flex;align-items:center;gap:12px}
+.mark{width:40px;height:40px;border-radius:12px;background:var(--brass);color:var(--deep);display:flex;align-items:center;justify-content:center;font:700 19px var(--D);flex:0 0 auto}
+.brand{color:#fff;display:flex;flex-direction:column;gap:4px}
+.brand svg{display:block}
+.lmark{flex:0 0 auto;border-radius:10px}
+.lmark.inv path,.lmark.inv circle{stroke:#0A403B}.lmark.inv circle,.lmark.inv path[fill="#D9AE55"]{fill:#0A403B}
+.brand small{display:block;font:400 12px var(--T);letter-spacing:0;color:rgba(255,255,255,.65)}
+.tel{margin-left:auto;color:#fff;text-decoration:none;font-weight:600;font-size:15px;white-space:nowrap}
+.top{background:linear-gradient(180deg,var(--night) 0,var(--night) 120px,var(--bg) 120px)}
+.cc{background:linear-gradient(150deg,var(--teal) 0%,var(--deep) 60%,var(--night) 100%);color:#fff;border-radius:24px;padding:22px 18px 18px;position:relative;overflow:hidden;box-shadow:0 18px 40px rgba(8,47,43,.25)}
+.cc::after{content:"";position:absolute;right:-70px;top:-70px;width:230px;height:230px;border-radius:50%;border:30px solid rgba(217,174,85,.13);pointer-events:none}
+h1{font:700 clamp(22px,6.4vw,28px)/1.15 var(--D);margin:0 0 6px;position:relative;z-index:1}
+.lead{color:rgba(255,255,255,.75);font-size:14px;margin:0 0 18px;position:relative;z-index:1}
+.cf{margin-bottom:14px;position:relative;z-index:1}
+.cf label{display:block;font-size:14px;color:rgba(255,255,255,.85);margin-bottom:6px}
+.cbox{display:flex;align-items:baseline;gap:6px;background:#fff;border-radius:14px;padding:9px 16px 11px}
+.cbox input{flex:1;min-width:0;border:0;background:none;text-align:right;font:500 24px var(--D);color:var(--ink);outline:none;padding:0}
+.cbox span{color:var(--ink2);font-weight:600}
+.cbox:focus-within{box-shadow:0 0 0 3px var(--brass)}
+input[type=range]{width:100%;margin:8px 0 0;accent-color:var(--brass);height:24px}
+.res{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;position:relative;z-index:1}
+.res>div{background:#fff;border-radius:14px;padding:12px 10px;text-align:center;color:var(--ink)}
+.res .l{font-size:12.5px;color:var(--ink2)}
+.res .v{font:700 clamp(16px,4.6vw,20px) var(--D);color:var(--teal);margin-top:4px}
+.res .main{grid-column:1/-1;background:var(--sand);padding:14px}
+.res .main .l{color:var(--brass-ink);font-size:14px}
+.res .main .v{color:var(--brass-ink);font-size:clamp(30px,9vw,40px)}
+.res .main .s{font-size:12.5px;color:#8A6A2A;margin-top:2px}
+.note{margin-top:12px;font-size:13px;color:rgba(255,255,255,.78);position:relative;z-index:1}
+.note b{color:var(--brass);font-weight:600}
+.card{background:#fff;border-radius:22px;padding:22px 18px;margin:16px 0;border:1px solid var(--line)}
+h2{font:700 20px/1.2 var(--D);margin:0 0 4px}
+.sub{color:var(--ink2);font-size:14px;margin:0 0 16px}
+.f{margin-bottom:14px}
+.f label{display:block;font-size:14px;font-weight:500;margin-bottom:6px}
+.f label i{font-style:normal;color:var(--ink2);font-weight:400}
+.f input,.f textarea{width:100%;font:16px var(--T);color:var(--ink);background:#F6F8F7;border:1px solid var(--line);border-radius:12px;padding:12px 14px;outline:none}
+.f textarea{min-height:84px;resize:vertical}
+.f input:focus,.f textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(14,91,83,.15);background:#fff}
+.f .hint{font-size:12.5px;color:var(--ink2);margin-top:5px}
+.f.bad input,.f.bad textarea{border-color:var(--err)}
+.f .err{display:none;font-size:13px;color:var(--err);margin-top:5px}
+.f.bad .err{display:block}
+.calcline{background:#F6F8F7;border-radius:12px;padding:10px 14px;font-size:14px;color:var(--ink2);margin-bottom:14px}
+.calcline b{color:var(--ink)}
+.photo{display:flex;align-items:center;gap:12px}
+.photo label.btn{flex:0 0 auto}
+.photo img{width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+.photo .x{border:0;background:none;color:var(--err);font:inherit;font-size:14px;cursor:pointer;padding:6px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:12px;padding:11px 16px;font:600 15px var(--T);cursor:pointer;text-decoration:none}
+.btn.pri{background:var(--teal);border-color:var(--teal);color:#fff;width:100%;padding:15px;font-size:16px;border-radius:14px}
+.btn.pri:disabled{opacity:.6;cursor:wait}
+.btn.wa{background:#1F8F55;border-color:#1F8F55;color:#fff;width:100%;padding:14px}
+.btn:focus-visible,.f input:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+.consent{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--ink2);margin:4px 0 16px;cursor:pointer}
+.consent input{width:22px;height:22px;margin:0;flex:0 0 auto;accent-color:var(--teal)}
+.consent.bad{color:var(--err)}
+.formerr{color:var(--err);font-size:14px;margin:0 0 12px;display:none}
+.formerr.on{display:block}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+details{font-size:13.5px;color:var(--ink2);margin-top:14px}
+details summary{cursor:pointer;color:var(--teal);font-weight:500}
+details p{margin:8px 0}
+.done{text-align:center;padding:30px 18px}
+.done .ok{width:64px;height:64px;border-radius:50%;background:var(--sand);color:var(--brass-ink);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:30px}
+.done p{color:var(--ink2);margin:6px 0 18px}
+.how{display:grid;gap:10px;margin:0;padding:0;list-style:none;counter-reset:s}
+.how li{display:flex;gap:12px;align-items:flex-start;font-size:14.5px}
+.how li::before{counter-increment:s;content:counter(s);flex:0 0 26px;height:26px;border-radius:50%;background:var(--sand);color:var(--brass-ink);font:700 13px var(--D);display:flex;align-items:center;justify-content:center;margin-top:1px}
+footer{text-align:center;color:var(--ink2);font-size:12.5px;padding:8px 16px 28px}
+@media (prefers-reduced-motion:no-preference){.done{animation:pop .35s ease-out}@keyframes pop{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><svg class="lmark inv" viewBox="0 0 200 200" width="40" height="40" aria-hidden="true"><rect width="200" height="200" rx="40" fill="#D9AE55"/><path d="M54 156V96C54 66 78 47 100 34C122 47 146 66 146 96V156" fill="none" stroke="#D9AE55" stroke-width="12" stroke-linejoin="round"/><path d="M40 156H160" stroke="#D9AE55" stroke-width="12" stroke-linecap="round"/><circle cx="100" cy="98" r="15" fill="#D9AE55"/><path d="M92 106L86 136H114L108 106Z" fill="#D9AE55"/></svg><div class="brand"><svg class="lword" viewBox="-6 0 392 80" height="15" style="width:auto;overflow:hidden" role="img" aria-label="AMANA"><g fill="none" stroke="currentColor" stroke-width="11" stroke-miterlimit="10"><path d="M-2 86L30-4L62 86M13 54H47M80 86V0L110 54L140 0V86M158 86L190-4L222 86M173 54H207M240 86V0L300 80M300 86V-6M318 86L350-4L382 86M333 54H367"/></g></svg><small>честная рассрочка</small></div><a class="tel" id="tel" href="#" hidden></a></div></header>
+
+<div class="top"><div class="wrap" style="padding-top:4px">
+<section class="cc" aria-labelledby="h1">
+  <h1 id="h1">Рассчитайте рассрочку</h1>
+  <p class="lead">Без процентов и штрафов: цена фиксируется в договоре и не растёт.</p>
+  <div class="cf"><label for="c_price">Стоимость товара</label><div class="cbox"><input id="c_price" data-k="price" inputmode="numeric" autocomplete="off" value="100000"><span>₽</span></div><input type="range" data-k="price" min="5000" max="500000" step="1000" value="100000" aria-label="Стоимость товара"></div>
+  <div class="cf"><label for="c_down">Первоначальный взнос</label><div class="cbox"><input id="c_down" data-k="down" inputmode="numeric" autocomplete="off" value="20000"><span>₽</span></div><input type="range" data-k="down" min="0" max="100000" step="1000" value="20000" aria-label="Первоначальный взнос"></div>
+  <div class="cf"><label for="c_months">Срок</label><div class="cbox"><input id="c_months" data-k="months" inputmode="numeric" autocomplete="off" value="6"><span>мес.</span></div><input type="range" data-k="months" min="1" max="24" step="1" value="6" aria-label="Срок"></div>
+  <div class="res" id="res" aria-live="polite"></div>
+  <p class="note"><b>Без процентов.</b> Если опоздаете с платежом, сумма не увеличится.</p>
+</section>
+</div></div>
+
+<main class="wrap">
+<section class="card" id="formCard" aria-labelledby="h2">
+  <h2 id="h2">Оставить заявку</h2>
+  <p class="sub">Мы перезвоним, уточним детали и купим товар для вас.</p>
+  <form id="form" novalidate>
+    <div class="calcline" id="calcline"></div>
+    <div class="f" id="f_name"><label for="name">Как вас зовут</label><input id="name" autocomplete="name" maxlength="80"><div class="err">Укажите имя</div></div>
+    <div class="f" id="f_phone"><label for="phone">Телефон</label><input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+7 928 000-00-00" maxlength="30"><div class="err">Укажите телефон полностью, например +7 928 000-00-00</div></div>
+    <div class="f" id="f_product"><label for="product">Что хотите купить</label><input id="product" maxlength="300" placeholder="Например, iPhone 16 Pro 256 ГБ"><div class="hint">Можно вставить ссылку на товар из магазина</div><div class="err">Напишите, какой товар нужен</div></div>
+    <div class="f"><label for="city">Город <i>— необязательно</i></label><input id="city" autocomplete="address-level2" maxlength="80" value="Махачкала"></div>
+    <div class="f"><label for="comment">Комментарий <i>— необязательно</i></label><textarea id="comment" maxlength="1000" placeholder="Цвет, память, удобное время для звонка"></textarea></div>
+    <div class="f"><label>Фото или скриншот товара <i>— необязательно</i></label>
+      <div class="photo"><label class="btn" for="photo">Прикрепить фото</label><input id="photo" type="file" accept="image/*" hidden><img id="ph" alt="Прикреплённое фото" hidden><button type="button" class="x" id="phx" hidden>Убрать</button></div></div>
+    <div class="hp" aria-hidden="true"><label>Сайт<input id="website" tabindex="-1" autocomplete="off"></label></div>
+    <label class="consent" id="consentL"><input type="checkbox" id="consent"><span>Согласен на обработку имени, телефона и города для связи по заявке. <a href="#policy">Подробнее</a></span></label>
+    <p class="formerr" id="formerr" role="alert"></p>
+    <button class="btn pri" type="submit" id="send">Отправить заявку</button>
+  </form>
+  <details id="policy"><summary>Как мы используем ваши данные</summary>
+    <p>Мы получаем только то, что вы указали в заявке: имя, телефон, город, описание товара и фото товара, если вы его прикрепили. Эти данные нужны, чтобы связаться с вами и подготовить предложение. Мы не передаём их третьим лицам и не используем для рассылок.</p>
+    <p>Заявка хранится не дольше года. Чтобы удалить её раньше, напишите или позвоните нам<span id="polPhone"></span>.</p>
+    <p id="polSeller"></p>
+  </details>
+</section>
+
+<section class="card" aria-labelledby="h3">
+  <h2 id="h3">Как это работает</h2>
+  <ol class="how" style="margin-top:12px">
+    <li>Вы оставляете заявку, мы перезваниваем и согласовываем товар, взнос и срок.</li>
+    <li>Мы покупаем товар на себя. По правилам мурабахи продаём только то, чем уже владеем.</li>
+    <li>Подписываем договор с фиксированной ценой и графиком. Вы вносите взнос и забираете товар.</li>
+    <li>Платите по графику. Без процентов и штрафов за просрочку.</li>
+  </ol>
+</section>
+</main>
+<footer>Расчёт предварительный. Окончательная цена фиксируется в договоре.</footer>
+
+<script>
+window.AMANAT_CONFIG={
+  SUPABASE_URL:"https://kmabheyrobdkesdcpmie.supabase.co",
+  SUPABASE_ANON_KEY:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttYWJoZXlyb2Jka2VzZGNwbWllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEyODUxMzksImV4cCI6MjEwNjg2MTEzOX0.XxFPaX4WkuUw0OLS8ODcnfU1ymh2Kcs-gt22DOvgCEg"
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s);
+const CFG=window.AMANAT_CONFIG;
+let SB=null;try{if(window.supabase)SB=window.supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_ANON_KEY,{auth:{persistSession:false}})}catch(e){}
+const ST={rate:4.37,roundTo:1,phone:"",seller:""};
+const s={price:100000,down:20000,months:6};
+let photo="";
+const rub=n=>Math.round(n).toLocaleString("ru-RU").replace(/[\u00a0\u202f]/g," ")+" ₽";
+const plural=(n,a,b,c)=>{const m=n%10,k=n%100;return m===1&&k!==11?a:m>=2&&m<=4&&(k<10||k>=20)?b:c};
+function calc(){
+  const price=Math.max(0,s.price),down=Math.min(Math.max(0,s.down),price),n=Math.max(1,s.months),fin=price-down;
+  if(fin<=0)return {price,down,n,fin:0,markup:0,monthly:0,last:0,total:price};
+  let markup=Math.round(fin*ST.rate/100*n),monthly=(fin+markup)/n;
+  if(ST.roundTo>1){monthly=Math.ceil(monthly/ST.roundTo)*ST.roundTo;markup=monthly*n-fin}else monthly=Math.round(monthly);
+  return {price,down,n,fin,markup,monthly,last:fin+markup-monthly*(n-1),total:price+markup};
+}
+function upd(){
+  const r=calc();
+  $("#res").innerHTML=r.fin>0?`<div class="main"><div class="l">Ежемесячный платёж</div><div class="v">${rub(r.monthly)}</div><div class="s">${r.n} ${plural(r.n,"платёж","платежа","платежей")}${r.last!==r.monthly?", последний "+rub(r.last):""}</div></div><div><div class="l">Торговая наценка</div><div class="v">${rub(r.markup)}</div></div><div><div class="l">Общая стоимость</div><div class="v">${rub(r.total)}</div></div>`
+    :`<div class="main"><div class="l">Взнос покрывает всю стоимость</div><div class="s">Уменьшите взнос, чтобы посчитать рассрочку</div></div>`;
+  $("#calcline").innerHTML=r.fin>0?`Ваш расчёт: <b>${rub(r.price)}</b>, взнос <b>${rub(r.down)}</b>, <b>${r.n} мес.</b> по <b>${rub(r.monthly)}</b>`:`Укажите стоимость и взнос в калькуляторе выше`;
+}
+document.addEventListener("input",e=>{const k=e.target.dataset.k;if(!k)return;
+  let v=parseInt(String(e.target.value).replace(/\D/g,""),10)||0;
+  if(k==="months")v=Math.min(120,Math.max(1,v||1));
+  if(k==="price")v=Math.min(v,100000000);
+  s[k]=v;
+  document.querySelectorAll(`[data-k="${k}"]`).forEach(x=>{if(x!==e.target){if(x.type==="range"&&v>+x.max)x.max=v;x.value=v}});
+  if(k==="price"){const dr=document.querySelector('input[type=range][data-k="down"]');dr.max=Math.max(1000,v);if(s.down>v){s.down=v;$("#c_down").value=v;dr.value=v}}
+  if(e.target.type!=="range"&&k!=="months"){/* keep raw while typing */}
+  upd();
+});
+// settings from the business (rate, phone)
+(async()=>{if(!SB)return;try{const {data}=await SB.rpc("public_settings");if(data){Object.assign(ST,{rate:+data.rate||4.37,roundTo:+data.roundTo||1,phone:data.phone||"",seller:data.seller||""});
+  if(ST.phone){const t=$("#tel");t.textContent=ST.phone;t.href="tel:"+ST.phone.replace(/[^\d+]/g,"");t.hidden=false;$("#polPhone").textContent=" по номеру "+ST.phone}
+  if(ST.seller)$("#polSeller").textContent="Ответственный за обработку данных: "+ST.seller+".";
+  upd()}}catch(e){}})();
+// photo
+function compress(file){return new Promise((res,rej)=>{const fr=new FileReader();fr.onerror=rej;fr.onload=()=>{const im=new Image();im.onerror=()=>rej(new Error("Не удалось открыть фото"));im.onload=()=>{
+  let w=im.width,h=im.height;const m=1280;if(w>m||h>m){const k=m/Math.max(w,h);w=Math.round(w*k);h=Math.round(h*k)}
+  const cv=document.createElement("canvas");cv.width=w;cv.height=h;const c=cv.getContext("2d");c.fillStyle="#fff";c.fillRect(0,0,w,h);c.drawImage(im,0,0,w,h);
+  let q=.78,d=cv.toDataURL("image/jpeg",q);while(d.length>600000&&q>.35){q-=.1;d=cv.toDataURL("image/jpeg",q)}
+  if(d.length>600000){const k=.7;cv.width=w*k;cv.height=h*k;c.drawImage(im,0,0,cv.width,cv.height);d=cv.toDataURL("image/jpeg",.6)}
+  res(d)};im.src=fr.result};fr.readAsDataURL(file)})}
+$("#photo").addEventListener("change",async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;try{photo=await compress(f);$("#ph").src=photo;$("#ph").hidden=false;$("#phx").hidden=false}catch(err){showErr("Не удалось прикрепить фото. Попробуйте другое.")}e.target.value=""});
+$("#phx").addEventListener("click",()=>{photo="";$("#ph").hidden=true;$("#phx").hidden=true});
+// form
+function showErr(t){const x=$("#formerr");x.textContent=t;x.classList.toggle("on",!!t)}
+const digits=p=>{let d=String(p||"").replace(/\D/g,"");if(d.length===11&&d[0]==="8")d="7"+d.slice(1);if(d.length===10)d="7"+d;return d};
+["name","phone","product"].forEach(id=>$("#"+id).addEventListener("input",()=>$("#f_"+id).classList.remove("bad")));
+$("#consent").addEventListener("change",()=>$("#consentL").classList.remove("bad"));
+$("#form").addEventListener("submit",async e=>{
+  e.preventDefault();showErr("");
+  if($("#website").value)return; // bot
+  const name=$("#name").value.trim(),phone=$("#phone").value.trim(),product=$("#product").value.trim();
+  let ok=true,first=null;
+  const bad=(id,cond)=>{$("#f_"+id).classList.toggle("bad",cond);if(cond){ok=false;first=first||$("#"+id)}};
+  bad("name",name.length<2);bad("phone",digits(phone).length<10||digits(phone).length>15);bad("product",product.length<2);
+  if(!$("#consent").checked){$("#consentL").classList.add("bad");if(ok){showErr("Отметьте согласие на обработку данных — без него мы не сможем с вами связаться.")}ok=false}
+  if(!ok){if(first)first.focus();return}
+  if(!SB){showErr("Нет связи с сервером. Проверьте интернет и попробуйте ещё раз.");return}
+  const r=calc();const btn=$("#send");btn.disabled=true;btn.textContent="Отправляю…";
+  const row={name,phone,product,city:$("#city").value.trim(),comment:$("#comment").value.trim(),consent:true,photo:photo||"",
+    price:r.price||null,down:r.fin>0?r.down:null,months:r.fin>0?r.n:null,monthly:r.fin>0?r.monthly:null,markup:r.fin>0?r.markup:null};
+  try{
+    const {error}=await SB.from("applications").insert(row);
+    if(error)throw error;
+    done(name,r,product);
+  }catch(err){
+    const m=String(err&&err.message||"");
+    showErr(/заяв|номера/i.test(m)?m:"Не удалось отправить заявку. Проверьте интернет и попробуйте ещё раз"+(ST.phone?" или позвоните нам: "+ST.phone:"")+".");
+    btn.disabled=false;btn.textContent="Отправить заявку";
+  }
+});
+function done(name,r,product){
+  const ph=digits(ST.phone);
+  const txt=`Здравствуйте! Я оставил(а) заявку на рассрочку: ${product}${r.fin>0?`, ${rub(r.price)}, взнос ${rub(r.down)}, ${r.n} мес.`:""}. Меня зовут ${name}.`;
+  $("#formCard").innerHTML=`<div class="done" role="status"><div class="ok" aria-hidden="true">✓</div><h2>Заявка отправлена</h2><p>Спасибо, ${name.replace(/[<>&"]/g,"")}! Мы перезвоним вам в ближайшее время.</p>${ph?`<a class="btn wa" href="https://wa.me/${ph}?text=${encodeURIComponent(txt)}" target="_blank" rel="noopener">Написать нам в WhatsApp</a>`:""}</div>`;
+  $("#formCard").scrollIntoView({behavior:"smooth",block:"start"});
+}
+upd();
+})();
+</script>
+</body>
+</html>
