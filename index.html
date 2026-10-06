@@ -885,7 +885,7 @@ function mDeal(id){
     <h3 style="margin-top:18px">График</h3>
     <div class="tw keep"><table><thead><tr><th>№</th><th>Дата</th><th class="n">Сумма</th><th class="n hide-m">Внесено</th><th>Статус</th></tr></thead><tbody>
     ${c.sched.map(x=>`<tr><td>${x.i}</td><td class="nw">${fmtD(x.due)}${x.moved?`<span class="mv" title="Срок перенесён" aria-label="перенесён">↷</span>`:""}</td><td class="n">${rub(x.amount)}</td><td class="n hide-m">${x.got?rub(x.got):"—"}</td><td>${stTag(x)}</td></tr>`).join("")}</tbody></table></div>
-    ${canDel()&&c.remaining>0?`<div style="margin-top:8px"><button class="btn sm" data-a="shift" data-id="${d.id}">Перенести платёж</button>${c.sched.some(x=>x.moved)?`<span class="small muted" style="margin-left:8px">↷ — срок перенесён</span>`:""}</div>`:""}
+    ${canDel()?`<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">${c.remaining>0?`<button class="btn sm" data-a="shift" data-id="${d.id}">Перенести платёж</button>`:""}<button class="btn sm" data-a="portal" data-id="${d.id}">Ссылка клиенту на график</button>${c.sched.some(x=>x.moved)?`<span class="small muted">↷ — срок перенесён</span>`:""}</div>`:""}
     ${(d.shiftLog||[]).length?`<p class="small muted" style="margin:6px 0 0">Переносы: ${d.shiftLog.map(s=>`№${s.i} ${fmtD(s.from)} → ${fmtD(s.to)}${s.all?" и следующие":""}${s.reason?" ("+esc(s.reason)+")":""}`).join("; ")}</p>`:""}
     <h3 style="margin-top:18px">Платежи</h3>
     ${c.pays.length?`<div class="tw keep"><table><thead><tr><th>№</th><th>Дата</th><th class="n">Сумма</th><th class="hide-m">Способ</th><th class="hide-m">Принял</th><th></th></tr></thead><tbody>
@@ -1068,7 +1068,7 @@ function vAccess(){
     <dt><b>Администратор</b></dt><dd style="text-align:left">первый зарегистрированный: всё, плюс раздаёт роли</dd>
     <dt><b>Владелец</b></dt><dd style="text-align:left">всё: касса, займы, отчёты, журнал, удаление</dd>
     <dt><b>Менеджер</b></dt><dd style="text-align:left">клиенты, товары, сделки, платежи, расходы; без удаления, без кассы, займов и прибыли</dd>
-    <dt><b>Просмотр</b></dt><dd style="text-align:left">только смотрит, как менеджер</dd>
+    <dt><b>Просмотр</b></dt><dd style="text-align:left">сотрудник, который только смотрит (например, бухгалтер): видит всех клиентов, сделки и фото документов. <b>Не для клиентов!</b></dd>
     <dt><b>Нет доступа</b></dt><dd style="text-align:left">видит только экран «Доступ закрыт»</dd></dl></section></div>`;
   if(isFull()){const cp=comp();
     h+=`<div class="grid2" style="margin-top:22px"><section class="panel"><div class="head" style="margin-bottom:8px"><h3 style="margin:0">Реквизиты AMANA</h3>${W(`<button class="btn sm" data-a="company">Изменить</button>`)}</div>
@@ -1088,6 +1088,7 @@ function vAccess(){
     const seen=Object.fromEntries(MEMBERS.map(m=>[m.id,m.lastSeen]));
     h+=`<section class="panel" style="margin-top:22px"><div class="head"><h2>Люди</h2>
       <label class="toggle"><input type="checkbox" data-a="req-pin" ${SETTINGS.requirePin?"checked":""}> Обязательный ПИН для всех</label></div>
+      <div class="note" style="margin:0 0 12px">Здесь только сотрудники. Клиенту вход не нужен: откройте его сделку и нажмите «Ссылка клиенту на график» — он увидит только свои платежи.</div>
       <div class="list people">${ids.length?ids.map(id=>{const rr=(SETTINGS.roles[id]||{}).role||"pending";
         return `<div class="item"><div><div class="t">${esc(who(id))}${rr==="pending"?` <span class="tag mid">новый</span>`:""}</div><div class="s">${esc((PROFILES[id]||{}).email||"")}${seen[id]?" · заходил "+fmtD(seen[id].slice(0,10)):""}</div>
           <input data-label="${esc(id)}" placeholder="Подпись (например, Аслан)" value="${esc((SETTINGS.roles[id]||{}).label||"")}" style="margin-top:6px;max-width:240px"></div>
@@ -1441,6 +1442,21 @@ function mQr(){
 async function qrOut(share){let b=dlg._qr;if(!b)b=await new Promise(r=>drawQrPoster(appLink()).toBlob(r,"image/png"));const name="AMANA_QR_заявка.png";
   if(share){const file=new File([b],name,{type:"image/png"});if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file]});return}catch(e){if(e&&e.name==="AbortError")return}}}
   if(saveBlob(name,b))toast("Картинка сохранена")}
+
+
+/* ---------- личная ссылка клиента ---------- */
+function portalURL(tok){return location.href.split("#")[0].split("?")[0].replace(/[^/]*$/,"")+"moy.html#t="+tok}
+function newToken(){return Array.from(crypto.getRandomValues(new Uint8Array(18)),b=>b.toString(16).padStart(2,"0")).join("")}
+async function mPortal(dealId,regen){
+  let d=byId("deals",dealId);if(!d)return;const c=dealCalc(d);
+  if(!d.token||regen){const tok=newToken();if(!(await save("deals",d.id,{...strip(d),token:tok})))return;d={...d,token:tok};if(regen)toast("Старая ссылка больше не работает")}
+  const url=portalURL(d.token);const ph=c.client&&phoneDigits(c.client.phone);
+  const txt=`Ассаляму алейкум${c.client?", "+c.client.name:""}! Ваш личный график платежей по рассрочке AMANA (договор ${d.code}): ${url}\nТам видно, сколько оплачено и когда следующий платёж. Ссылка личная — не пересылайте её другим.`;
+  openModal("Ссылка клиенту на график",`<p class="small muted" style="margin:0 0 10px">По этой ссылке ${esc(c.client?c.client.name:"клиент")} видит только свою сделку: график, платежи и остаток. Входить в приложение не нужно, чужие данные он не увидит.</p>
+    <div class="linkbox"><code>${esc(url)}</code></div>
+    <p class="small muted" style="margin:10px 0 0">Если ссылка попала не тому человеку, нажмите «Новая ссылка» — старая перестанет работать.</p>`,
+    `<button class="btn dng" data-a="portal-new" data-id="${d.id}" style="margin-right:auto">Новая ссылка</button><button class="btn" data-a="portal-copy" data-v="${esc(url)}">Скопировать</button>${ph?`<a class="btn pri" target="_blank" rel="noopener" href="https://wa.me/${ph}?text=${encodeURIComponent(txt)}">Отправить в WhatsApp</a>`:""}`);
+}
 
 /* ---------- applications (заявки) ---------- */
 let APPS=[],appsSub=false,appsLoaded=false;
@@ -1909,6 +1925,9 @@ document.addEventListener("click",async e=>{
     case "sheet":openSheet(t.dataset.v);break;
     case "mk-auto":dealCalcPreview("auto");break;
     case "paid":mPaid(id);break;
+    case "portal":mPortal(id);break;
+    case "portal-new":mPortal(id,true);break;
+    case "portal-copy":{const u=t.dataset.v;(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>toast("Ссылка скопирована")).catch(()=>toast(u))}break;
     case "app-qr":mQr();break;
     case "qr-save":qrOut(false);break;
     case "qr-share":qrOut(true);break;

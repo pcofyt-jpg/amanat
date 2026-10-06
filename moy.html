@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>AMANA — мой график платежей</title>
+<meta name="theme-color" content="#0A403B">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Unbounded:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--teal:#0E5B53;--deep:#0A403B;--night:#082F2B;--brass:#D9AE55;--brass-ink:#7A5713;--sand:#F4EAD3;--ink:#0F2A2A;--ink2:#4A5D5F;--line:#DCE4E2;--bg:#EEF2F0;--ok:#1F7A4D;--ok-soft:#E3F2EA;--warn:#9A6200;--warn-soft:#FBEFD9;
+  --D:"Unbounded","Golos Text",system-ui,sans-serif;--T:"Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 var(--T);padding-bottom:env(safe-area-inset-bottom,0px)}
+.wrap{max-width:560px;margin:0 auto;padding:0 16px}
+header{background:var(--night);color:#fff;padding:calc(14px + env(safe-area-inset-top,0px)) 0 14px}
+header .wrap{display:flex;align-items:center;gap:12px}
+.lmark{flex:0 0 auto;border-radius:10px}
+.brand{display:flex;flex-direction:column;gap:4px;color:#fff}
+.brand small{font-size:12px;color:rgba(255,255,255,.65)}
+.top{background:linear-gradient(180deg,var(--night) 0,var(--night) 110px,var(--bg) 110px)}
+.hero{background:linear-gradient(150deg,var(--teal) 0%,var(--deep) 60%,var(--night) 100%);color:#fff;border-radius:24px;padding:22px 18px 20px;position:relative;overflow:hidden;box-shadow:0 18px 40px rgba(8,47,43,.25)}
+.hero::after{content:"";position:absolute;right:-70px;top:-70px;width:230px;height:230px;border-radius:50%;border:30px solid rgba(217,174,85,.13);pointer-events:none}
+.hero>*{position:relative;z-index:1}
+.hi{font:700 clamp(20px,5.6vw,24px)/1.2 var(--D);margin:0 0 4px}
+.sub{color:rgba(255,255,255,.75);font-size:14px;margin:0 0 18px}
+.left .l{font-size:14px;color:rgba(255,255,255,.8)}
+.left .v{font:700 clamp(34px,10vw,44px)/1.1 var(--D);margin:4px 0 12px}
+.bar{height:10px;border-radius:6px;background:rgba(255,255,255,.18);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--brass);border-radius:6px}
+.barl{display:flex;justify-content:space-between;font-size:13px;color:rgba(255,255,255,.8);margin-top:6px}
+.next{margin-top:18px;background:var(--sand);color:var(--ink);border-radius:16px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.next .l{font-size:13px;color:var(--brass-ink)}
+.next .d{font-weight:600}
+.next .v{font:700 22px var(--D);color:var(--brass-ink);white-space:nowrap}
+.next.due{background:#FDE7E3}.next.due .l,.next.due .v{color:#9B2C1C}
+.done{margin-top:18px;background:var(--sand);color:var(--brass-ink);border-radius:16px;padding:16px;font-weight:600;text-align:center}
+.card{background:#fff;border-radius:22px;padding:20px 18px;margin:16px 0;border:1px solid var(--line)}
+h2{font:700 18px/1.2 var(--D);margin:0 0 12px}
+.row{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0}
+.row .n{width:26px;height:26px;border-radius:50%;background:var(--bg);color:var(--ink2);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.row .dt{flex:1}
+.row .dt small{display:block;color:var(--ink2);font-size:12.5px}
+.row .am{font-weight:600;white-space:nowrap}
+.tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap}
+.tag.ok{background:var(--ok-soft);color:var(--ok)}.tag.wait{background:var(--bg);color:var(--ink2)}.tag.due{background:#FDE7E3;color:#9B2C1C}.tag.part{background:var(--warn-soft);color:var(--warn)}
+.kv{display:grid;grid-template-columns:1fr auto;gap:8px 12px;margin:0;font-size:15px}
+.kv dt{color:var(--ink2)}.kv dd{margin:0;text-align:right;font-weight:500}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{display:flex;align-items:center;justify-content:center;border-radius:14px;padding:14px;font:600 15px var(--T);text-decoration:none;border:1px solid var(--line);color:var(--ink);background:#fff}
+.btn.wa{background:#1F8F55;border-color:#1F8F55;color:#fff}
+.btn:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+.msg{text-align:center;padding:40px 18px}
+.msg p{color:var(--ink2)}
+footer{text-align:center;color:var(--ink2);font-size:12.5px;padding:8px 16px 28px}
+.skel{height:220px;border-radius:24px;background:linear-gradient(90deg,#0E5B53,#11695f,#0E5B53);opacity:.6}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <svg class="lmark" viewBox="0 0 200 200" width="40" height="40" aria-hidden="true"><rect width="200" height="200" rx="40" fill="#D9AE55"/><path d="M54 156V96C54 66 78 47 100 34C122 47 146 66 146 96V156" fill="none" stroke="#0A403B" stroke-width="12" stroke-linejoin="round"/><path d="M40 156H160" stroke="#0A403B" stroke-width="12" stroke-linecap="round"/><circle cx="100" cy="98" r="15" fill="#0A403B"/><path d="M92 106L86 136H114L108 106Z" fill="#0A403B"/></svg>
+  <div class="brand"><svg viewBox="-6 0 392 80" height="15" style="width:auto;display:block" role="img" aria-label="AMANA"><g fill="none" stroke="currentColor" stroke-width="11" stroke-miterlimit="10"><path d="M-2 86L30-4L62 86M13 54H47M80 86V0L110 54L140 0V86M158 86L190-4L222 86M173 54H207M240 86V0L300 80M300 86V-6M318 86L350-4L382 86M333 54H367"/></g></svg><small>мой график платежей</small></div>
+</div></header>
+<div class="top"><div class="wrap" style="padding-top:4px" id="main"><div class="skel" aria-label="Загружаю…"></div></div></div>
+<main class="wrap" id="more"></main>
+<footer>Без процентов и штрафов: цена зафиксирована в договоре и не растёт.<br>Это личная страница — не пересылайте ссылку другим.</footer>
+
+<script>
+window.AMANAT_CONFIG={
+  SUPABASE_URL:"https://kmabheyrobdkesdcpmie.supabase.co",
+  SUPABASE_ANON_KEY:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImttYWJoZXlyb2Jka2VzZGNwbWllIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEyODUxMzksImV4cCI6MjEwNjg2MTEzOX0.XxFPaX4WkuUw0OLS8ODcnfU1ymh2Kcs-gt22DOvgCEg"
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s);
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const num=v=>{const n=parseFloat(String(v??"").replace(",","."));return isFinite(n)?n:0};
+const rub=n=>Math.round(n).toLocaleString("ru-RU").replace(/[\u00a0\u202f]/g," ")+" ₽";
+const pad=n=>String(n).padStart(2,"0");
+const toISO=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+const parseISO=s=>{const [y,m,d]=String(s).split("-").map(Number);return new Date(y,m-1,d)};
+const fmtD=s=>{if(!s)return "";const [y,m,d]=s.split("-");return d+"."+m+"."+y};
+const addDays=(iso,k)=>{const d=parseISO(iso);d.setDate(d.getDate()+k);return toISO(d)};
+const addMonths=(iso,k)=>{const d=parseISO(iso);const day=d.getDate();const t=new Date(d.getFullYear(),d.getMonth()+k,1);const last=new Date(t.getFullYear(),t.getMonth()+1,0).getDate();t.setDate(Math.min(day,last));return toISO(t)};
+const dueDate=(start,period,i)=>period==="week"?addDays(start,7*i):period==="biweek"?addDays(start,14*i):addMonths(start,i);
+const plural=(n,a,b,c)=>{const m=n%10,k=n%100;return m===1&&k!==11?a:m>=2&&m<=4&&(k<10||k>=20)?b:c};
+const digits=p=>{let d=String(p||"").replace(/\D/g,"");if(d.length===11&&d[0]==="8")d="7"+d.slice(1);return d};
+
+function fail(title,text){$("#main").innerHTML=`<div class="card msg"><h2>${title}</h2><p>${text}</p></div>`;$("#more").innerHTML=""}
+
+function render(j){
+  const d=j.deal,today=toISO(new Date());
+  const price=num(d.price),down=num(d.down),n=Math.max(1,Math.round(num(d.count)||1)),base=Math.max(0,price-down),inst=Math.round(base/n);
+  const pays=j.payments||[],paid=pays.reduce((s,p)=>s+num(p.amount),0),waived=num(d.waived);
+  let rest=paid+waived;const sched=[];
+  for(let i=1;i<=n;i++){const amount=i<n?inst:base-inst*(n-1);const sh=d.shifts&&(d.shifts[i]||d.shifts[String(i)]);const due=sh||dueDate(d.date,d.period,i);
+    const got=Math.max(0,Math.min(amount,rest));rest-=got;const left=amount-got;
+    sched.push({i,due,amount,got,left,st:left<=0?"paid":due<today?"due":got>0?"part":"wait"})}
+  const received=down+paid,remaining=Math.max(0,price-received-waived),next=sched.find(x=>x.left>0);
+  const name=(j.client&&j.client.name)||"";const first=name.split(" ")[0];
+  const prod=j.product?[j.product.name,j.product.model].filter(Boolean).join(" "):"";
+  const pct=price?Math.min(100,Math.round((received+waived)/price*100)):0;
+  const ph=j.company&&j.company.phone,phd=digits(ph);
+  $("#main").innerHTML=`<section class="hero" aria-label="Сводка">
+    <p class="hi">Ассаляму алейкум${first?", "+esc(first):""}!</p>
+    <p class="sub">Договор ${esc(d.code)} от ${fmtD(d.date)}${prod?" · "+esc(prod):""}</p>
+    ${remaining>0?`<div class="left"><div class="l">Осталось оплатить</div><div class="v">${rub(remaining)}</div></div>
+      <div class="bar" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div>
+      <div class="barl"><span>Оплачено ${rub(received)}</span><span>из ${rub(price)}</span></div>
+      ${next?`<div class="next ${next.st==="due"?"due":""}"><div><div class="l">${next.st==="due"?"Ждёт оплаты":"Следующий платёж"}</div><div class="d">${fmtD(next.due)}</div></div><div class="v">${rub(next.left)}</div></div>`:""}`
+    :`<div class="done">Рассрочка полностью погашена.<br>БаракаЛлаху фикум! Спасибо, что выбрали нас.</div>`}
+  </section>`;
+  const stl={paid:["Оплачен","ok"],due:["Ждёт оплаты","due"],part:["Частично","part"],wait:["Ожидается","wait"]};
+  $("#more").innerHTML=`<section class="card"><h2>График платежей</h2>
+    ${sched.map(x=>`<div class="row"><span class="n">${x.i}</span><div class="dt">${fmtD(x.due)}${x.st==="part"?`<small>внесено ${rub(x.got)} из ${rub(x.amount)}</small>`:""}</div><span class="am">${rub(x.amount)}</span><span class="tag ${stl[x.st][1]}">${stl[x.st][0]}</span></div>`).join("")}
+  </section>
+  <section class="card"><h2>Условия</h2><dl class="kv">
+    <dt>Цена товара</dt><dd>${rub(price)}</dd>${down?`<dt>Первый взнос</dt><dd>${rub(down)}</dd>`:""}
+    <dt>Платежей</dt><dd>${n} по ${rub(inst)}</dd>${waived?`<dt>Скидка при досрочном погашении</dt><dd>${rub(waived)}</dd>`:""}
+    <dt>Проценты и штрафы</dt><dd>нет</dd></dl></section>
+  ${pays.length?`<section class="card"><h2>Мои платежи</h2>${pays.slice().reverse().map(p=>`<div class="row"><div class="dt">${fmtD(p.date)}<small>квитанция ${esc(p.code||"")}</small></div><span class="am">${rub(num(p.amount))}</span></div>`).join("")}</section>`:""}
+  ${phd?`<section class="card"><h2>Вопросы по оплате</h2><div class="btns"><a class="btn wa" href="https://wa.me/${phd}?text=${encodeURIComponent(`Ассаляму алейкум! Вопрос по договору ${d.code}.`)}" target="_blank" rel="noopener">WhatsApp</a><a class="btn" href="tel:+${phd}">Позвонить</a></div></section>`:""}`;
+  document.title="AMANA — график по договору "+d.code;
+}
+
+window.addEventListener("hashchange",()=>location.reload());
+const token=new URLSearchParams(location.hash.slice(1)).get("t")||"";
+if(token.length<24){fail("Нужна личная ссылка","Попросите менеджера AMANA прислать ссылку на ваш график платежей.")}
+else if(!window.supabase){fail("Нет связи","Проверьте интернет и обновите страницу.")}
+else{
+  const SB=window.supabase.createClient(AMANAT_CONFIG.SUPABASE_URL,AMANAT_CONFIG.SUPABASE_ANON_KEY,{auth:{persistSession:false}});
+  SB.rpc("client_portal",{p_token:token}).then(({data,error})=>{
+    if(error)return fail("Не удалось загрузить","Проверьте интернет и обновите страницу.");
+    if(!data||!data.deal)return fail("Ссылка недействительна","Возможно, её заменили на новую. Попросите менеджера AMANA прислать актуальную ссылку.");
+    render(data);
+  },()=>fail("Нет связи","Проверьте интернет и обновите страницу."));
+}
+})();
+</script>
+</body>
+</html>
