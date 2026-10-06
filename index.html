@@ -140,6 +140,28 @@ tr.sel td{background:var(--primary-soft)}
 .toggle{display:flex;gap:10px;align-items:center;cursor:pointer}
 .toggle input{width:18px;height:18px;accent-color:var(--primary)}
 .lockbtn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:4px 10px;font-size:13px;cursor:pointer;color:var(--ink-2)}
+.cc{background:linear-gradient(150deg,#0E5B53 0%,#0A403B 60%,#082F2B 100%);color:#fff;border-radius:22px;padding:22px 20px 20px;position:relative;overflow:hidden;box-shadow:0 18px 40px rgba(8,47,43,.25)}
+.cc::after{content:"";position:absolute;right:-60px;top:-60px;width:220px;height:220px;border-radius:50%;border:28px solid rgba(217,174,85,.13)}
+.cc h2{font-family:Unbounded,"Golos Text",sans-serif;font-weight:700;font-size:clamp(20px,5vw,26px);margin:0 0 4px;color:#fff}
+.cc .sub{color:rgba(255,255,255,.7);font-size:13px;margin-bottom:18px}
+.cc .lg{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.cc .mark{width:38px;height:38px;border-radius:11px;background:#D9AE55;color:#0A403B;display:flex;align-items:center;justify-content:center;font-family:Unbounded,sans-serif;font-weight:700;font-size:18px}
+.cc .nm{font-family:Unbounded,sans-serif;font-weight:700;letter-spacing:.06em;font-size:15px}
+.cf{margin-bottom:16px;position:relative;z-index:1}
+.cf label{display:block;font-size:14px;color:rgba(255,255,255,.85);margin-bottom:7px}
+.cbox{display:flex;align-items:baseline;gap:6px;background:#fff;border-radius:14px;padding:10px 16px 12px}
+.cbox input{flex:1;min-width:0;border:0;background:none;text-align:right;font-family:Unbounded,"Golos Text",sans-serif;font-size:24px!important;font-weight:500;color:#0F2A2A;outline:none;padding:0}
+.cbox span{color:#4A5D5F;font-weight:600;font-size:16px}
+.cf input[type=range]{width:100%;margin:10px 0 0;accent-color:#D9AE55;height:22px}
+.cres{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:6px;position:relative;z-index:1}
+.cres>div{background:#fff;border-radius:14px;padding:12px 8px;text-align:center;color:#0F2A2A}
+.cres .l{font-size:12px;color:#4A5D5F;line-height:1.25;min-height:30px;display:flex;align-items:center;justify-content:center}
+.cres .v{font-family:Unbounded,"Golos Text",sans-serif;font-weight:700;font-size:clamp(15px,4.2vw,20px);color:#0E5B53;margin-top:6px;border-top:1px solid #E3E9E7;padding-top:8px}
+.cres .main{background:#F4EAD3}
+.cres .main .v{color:#7A5713}
+.calcgrid{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}
+@media (max-width:860px){.calcgrid{grid-template-columns:1fr}}
+.cfoot{margin-top:14px;font-size:12.5px;color:rgba(255,255,255,.75);position:relative;z-index:1}
 .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--ink-2);margin:10px 2px 0}
 .legend span::before{content:"";display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px;background:var(--sw)}
 
@@ -294,7 +316,7 @@ const COLS=["clients","products","deals","payments","loans","partners","expenses
 const comp=()=>S.company.find(x=>x.id==="main")||{};
 const S={}; COLS.forEach(c=>S[c]=[]);
 let db=null, userCap=null, downloads=null, ME={id:null,isOwner:false,name:"",avatarUrl:""}, SETTINGS={roles:{},requirePin:false}, MEMBERS=[], LOG=[], NAMES={}, PIN=null, gateReady=false, unlocked=false, pinFails=0, pinBlockUntil=0, canWrite=true, loaded=new Set(), offline=false;
-const TABS=[["home","Сводка"],["deals","Сделки"],["clients","Клиенты"],["products","Товары"],["cash","Касса"],["capital","Займы и партнёры"],["expenses","Расходы"],["reports","Отчёты"],["zakat","Закят"],["log","Журнал"],["access","Доступ"],["rules","Правила"]];
+const TABS=[["home","Сводка"],["calc","Калькулятор"],["deals","Сделки"],["clients","Клиенты"],["products","Товары"],["cash","Касса"],["capital","Займы и партнёры"],["expenses","Расходы"],["reports","Отчёты"],["zakat","Закят"],["log","Журнал"],["access","Доступ"],["rules","Правила"]];
 const FULL_ONLY=["cash","capital","reports","log","zakat"];
 const visTabs=()=>TABS.filter(([k])=>isFull()||!FULL_ONLY.includes(k));
 let tab="home"; try{tab=localStorage.getItem("amanat-tab")||"home"}catch(e){}
@@ -450,9 +472,10 @@ function draw(){
   if(offline) h+=`<div class="banner">Нет связи с базой данных. Проверьте интернет и настройки Supabase в начале файла index.html.</div>`;
   else if(!canWrite) h+=`<div class="banner">У вас доступ только для просмотра. Попросите владельца выдать права на изменение.</div>`;
   else if(role()==="view") h+=`<div class="banner">Ваша роль — «Просмотр»: вносить изменения нельзя.</div>`;
-  const V={zakat:vZakat,log:vLog,access:vAccess,home:vHome,deals:vDeals,clients:vClients,products:vProducts,cash:vCash,capital:vCapital,expenses:vExpenses,reports:vReports,rules:vRules};
+  const V={calc:vCalc,zakat:vZakat,log:vLog,access:vAccess,home:vHome,deals:vDeals,clients:vClients,products:vProducts,cash:vCash,capital:vCapital,expenses:vExpenses,reports:vReports,rules:vRules};
   h+=V[tab](deals);
   const app=$("#app"); const y=window.scrollY; app.innerHTML=h; window.scrollTo(0,y);
+  if(tab==="calc")updateCalc();
   const s=$("#q"); if(s&&ui.focusQ){s.focus();s.setSelectionRange(s.value.length,s.value.length)}
 }
 function W(html){return canAdd()?html:""}
@@ -949,6 +972,12 @@ function vAccess(){
       <div class="row-actions"><button class="btn pri" data-a="export">Excel (все таблицы)</button><button class="btn" data-a="backup-json">Полная копия с фото (JSON)</button></div>
       ${ME.isOwner?`<p class="small muted" style="margin:14px 0 6px">Перенос из версии на claude.ai: там во вкладке «Доступ» скачайте «Полную копию (JSON)» и загрузите её сюда.</p><div class="row-actions"><button class="btn" data-a="import-json">Загрузить копию (JSON)</button><input type="file" id="importFile" accept=".json,application/json" hidden></div>`:""}</section></div>`;
   }
+  if(isFull()){const st=calcSettings();
+    h+=`<section class="panel" style="margin-top:22px"><h3>Ставка калькулятора</h3><div class="form">
+      <div class="f"><label>Наценка за месяц, %</label><input id="c_rate" type="number" inputmode="decimal" step="0.01" value="${st.rate}"><div class="hint">Наценка = (стоимость − взнос) × ставка × месяцы</div></div>
+      <div class="f"><label>Округлять платёж</label><select id="c_round">${[[1,"до рубля"],[10,"до 10 ₽"],[50,"до 50 ₽"],[100,"до 100 ₽"]].map(([v,l])=>`<option value="${v}" ${st.round===v?"selected":""}>${l}</option>`).join("")}</select></div></div>
+      <div class="row-actions" style="margin-top:10px">${W(`<button class="btn sm" data-a="calc-save">Сохранить ставку</button>`)}</div></section>`;
+  }
   if(ME.isOwner&&db){
     const ids=[...new Set([...MEMBERS.map(m=>m.id),...Object.keys(SETTINGS.roles||{})])].filter(id=>id!==ME.id);
     const seen=Object.fromEntries(MEMBERS.map(m=>[m.id,m.lastSeen]));
@@ -983,6 +1012,48 @@ function vLog(){
 
 /* ---------- file save (browser) ---------- */
 function saveBlob(name,blob){try{const u=URL.createObjectURL(blob);const a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);return true}catch(e){toast("Не удалось сохранить файл");return false}}
+
+
+/* ---------- calculator ---------- */
+const DEF_RATE=4.37;
+function calcSettings(){const c=comp();return {rate:c.rate!==undefined&&c.rate!==""?num(c.rate):DEF_RATE,round:num(c.roundTo)||1}}
+function calcInstallment(price,down,n,rate,round){
+  price=Math.max(0,Math.round(price));down=Math.max(0,Math.min(Math.round(down),price));n=Math.max(1,Math.round(n));
+  const fin=price-down;if(fin<=0)return {fin:0,markup:0,total:price,monthly:0,last:0,n,price,down};
+  let markup=Math.round(fin*rate/100*n);let monthly=(fin+markup)/n;
+  if(round>1){monthly=Math.ceil(monthly/round)*round;markup=monthly*n-fin}else monthly=Math.round(monthly);
+  const last=fin+markup-monthly*(n-1);
+  return {fin,markup,total:price+markup,monthly,last,n,price,down};
+}
+function calcState(){if(!ui.calc)ui.calc={price:100000,down:0,months:6};return ui.calc}
+function vCalc(){
+  const s=calcState(),st=calcSettings();
+  const pm=Math.max(500000,s.price);
+  return `<div class="cols calcgrid">
+  <section class="cc">
+    <div class="lg"><div class="mark">A</div><div class="nm">AMANAT</div></div>
+    <h2>Калькулятор рассрочки</h2><div class="sub">Без процентов и штрафов — цена фиксируется в договоре</div>
+    <div class="cf"><label for="c_price">Стоимость товара или услуги</label><div class="cbox"><input id="c_price" data-calc="price" inputmode="numeric" value="${s.price}"><span>₽</span></div><input type="range" data-calc="price" min="0" max="${pm}" step="1000" value="${s.price}" aria-label="Стоимость"></div>
+    <div class="cf"><label for="c_down">Первоначальный взнос</label><div class="cbox"><input id="c_down" data-calc="down" inputmode="numeric" value="${s.down}"><span>₽</span></div><input type="range" data-calc="down" min="0" max="${s.price}" step="1000" value="${Math.min(s.down,s.price)}" aria-label="Первоначальный взнос"></div>
+    <div class="cf"><label for="c_months">Срок рассрочки</label><div class="cbox"><input id="c_months" data-calc="months" inputmode="numeric" value="${s.months}"><span>мес.</span></div><input type="range" data-calc="months" min="1" max="24" step="1" value="${s.months}" aria-label="Срок"></div>
+    <div class="cres" id="cres"></div>
+    <div class="cfoot" id="cfoot"></div>
+  </section>
+  <div>
+    <section class="panel"><h3>Расчёт подробно</h3><div id="cdetail"></div>
+      <div class="row-actions" style="margin-top:14px">${W(`<button class="btn pri" data-a="calc-deal">Оформить сделку</button>`)}<button class="btn" data-a="calc-wa">Отправить клиенту</button><button class="btn" data-a="calc-copy">Скопировать</button></div></section>
+  </div></div>`;
+}
+function calcResult(){const s=calcState(),st=calcSettings();return calcInstallment(s.price,s.down,s.months,st.rate,st.round)}
+function updateCalc(){
+  const r=calcResult();const el=$("#cres");if(!el)return;
+  el.innerHTML=`<div class="main"><div class="l">Ежемесячный платёж</div><div class="v">${rub(r.monthly)}</div></div><div><div class="l">Торговая наценка</div><div class="v">${rub(r.markup)}</div></div><div><div class="l">Общая стоимость</div><div class="v">${rub(r.total)}</div></div>`;
+  $("#cfoot").textContent=r.fin>0?`${r.n} ${plural(r.n,"платёж","платежа","платежей")} по ${rub(r.monthly)}${r.last!==r.monthly?", последний "+rub(r.last):""}`:"Укажите стоимость больше первого взноса";
+  const today=todayISO();
+  $("#cdetail").innerHTML=r.fin>0?`<dl class="kv"><dt>Стоимость</dt><dd>${rub(r.price)}</dd><dt>Первый взнос</dt><dd>${rub(r.down)}</dd><dt>Сумма в рассрочку</dt><dd>${rub(r.fin)}</dd><dt>Наценка</dt><dd>${rub(r.markup)}</dd><div class="sep"></div><dt class="strong">Общая стоимость</dt><dd class="strong">${rub(r.total)}</dd></dl>
+    <div class="tw keep" style="margin-top:12px"><table><thead><tr><th>№</th><th>Примерная дата</th><th class="n">Сумма</th></tr></thead><tbody>${Array.from({length:r.n},(_,i)=>`<tr><td>${i+1}</td><td>${fmtD(addMonths(today,i+1))}</td><td class="n">${rub(i===r.n-1?r.last:r.monthly)}</td></tr>`).join("")}</tbody></table></div>`:`<p class="muted small">Нет суммы для рассрочки.</p>`;
+}
+function calcText(){const r=calcResult();return `Расчёт рассрочки AMANAT\nСтоимость: ${rub(r.price)}\nПервый взнос: ${rub(r.down)}\nСрок: ${r.n} мес.\nЕжемесячный платёж: ${rub(r.monthly)}${r.last!==r.monthly?" (последний "+rub(r.last)+")":""}\nОбщая стоимость: ${rub(r.total)}\nБез процентов и штрафов — цена фиксируется в договоре.`.replace(/[\u00a0\u202f]/g," ")}
 
 /* ---------- company ---------- */
 function mCompany(){
@@ -1399,6 +1470,10 @@ document.addEventListener("click",async e=>{
   }
   switch(a){
     case "close":closeModal();break;
+    case "calc-deal":{const r=calcResult();mNewDeal(null);setTimeout(()=>{if(!dlg.querySelector("[name=price]"))return;const set=(n,v)=>{const x=dlg.querySelector(`[name=${n}]`);if(x)x.value=v};const sel=dlg.querySelector("[name=productId]");if(sel){const m=S.products.find(p=>!productStatus(p).sold&&num(p.cost)===r.price);if(m)sel.value=m.id}set("down",r.down);set("count",r.n);set("period","month");const p=sel&&byId("products",sel.value);const cost=p?num(p.cost):r.price;set("price",cost+r.markup+(cost!==r.price?0:0));set("markup",cost+r.markup-cost);dealCalcPreview("markup")},30)}break;
+    case "calc-wa":window.open("https://wa.me/?text="+encodeURIComponent(calcText()),"_blank","noopener");break;
+    case "calc-copy":{const tx=calcText();(navigator.clipboard?navigator.clipboard.writeText(tx):Promise.reject()).then(()=>toast("Расчёт скопирован")).catch(()=>{const ta=document.createElement("textarea");ta.value=tx;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");toast("Расчёт скопирован")}catch(_){toast("Не удалось скопировать")}ta.remove()})}break;
+    case "calc-save":{const rate=num(($("#c_rate")||{}).value),rnd=num(($("#c_round")||{}).value)||1;if(rate<0||rate>20){toast("Ставка от 0 до 20%");break}if(await save("company","main",{...strip(comp()),rate,roundTo:rnd}))toast("Ставка сохранена: "+String(rate).replace(".",",")+"% в месяц")}break;
     case "contract":contractPDF(id);break;
     case "receipt":receiptPDF(id);break;
     case "early":mEarly(id);break;
@@ -1482,6 +1557,12 @@ document.addEventListener("change",async e=>{const t=e.target;
   if(t.dataset.label!==undefined){const id=t.dataset.label;const {error}=await SB.from("profiles").update({label:t.value.trim()}).eq("id",id);if(error)toast("Не удалось сохранить подпись");else{toast("Подпись сохранена");loadProfiles()}}
   if(t.id==="importFile"&&t.files&&t.files[0]){importJSON(t.files[0]);t.value=""}
 });
+document.addEventListener("input",e=>{const k=e.target.dataset&&e.target.dataset.calc;if(!k)return;const s=calcState();
+  let v=Math.round(num(String(e.target.value).replace(/\D/g,"")));if(k==="months")v=Math.min(120,Math.max(1,v||1));
+  s[k]=v;if(k==="price"&&s.down>s.price)s.down=s.price;
+  document.querySelectorAll(`[data-calc="${k}"]`).forEach(x=>{if(x!==e.target)x.value=v});
+  if(k==="price"){const dr=document.querySelector('input[type=range][data-calc="down"]');if(dr){dr.max=v;dr.value=Math.min(s.down,v)}const dn=$("#c_down");if(dn&&num(dn.value)>v)dn.value=s.down;const pr=document.querySelector('input[type=range][data-calc="price"]');if(pr&&v>+pr.max)pr.max=v}
+  updateCalc()});
 document.addEventListener("input",e=>{if(e.target.id==="q"){ui.q=e.target.value;ui.focusQ=true;draw();ui.focusQ=false}});
 
 /* ---------- Supabase ---------- */
