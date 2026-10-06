@@ -213,6 +213,53 @@ dialog::backdrop{background:rgba(10,20,20,.45)}
   .hide-m{display:none}
   .search{min-width:0;flex:1}
 }
+/* ---- phone layout ---- */
+@media (max-width:860px){
+  input,select,textarea,.search{font-size:16px!important}
+}
+@media (max-width:640px){
+  html,body{overflow-x:hidden}
+  .nav button{padding:8px 10px 11px;font-size:14px}
+  .head{flex-direction:column;align-items:stretch}
+  .head .filters{width:100%}
+  .head .btn.pri{justify-content:center}
+  .filters .chip{flex:0 0 auto}
+  .hero .val{font-size:24px}
+  .hero > div{padding:14px 16px}
+  .tw:not(.keep){border:0;background:none;overflow:visible}
+  .tw:not(.keep) table,.tw:not(.keep) tbody,.tw:not(.keep) tfoot,.tw:not(.keep) tr,.tw:not(.keep) td{display:block;width:100%}
+  .tw:not(.keep) thead{display:none}
+  .tw:not(.keep) tbody tr,.tw:not(.keep) tfoot tr{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 12px;margin-bottom:10px}
+  .tw:not(.keep) tfoot tr{background:var(--surface-2)}
+  .tw:not(.keep) td{border:0;padding:5px 0;display:flex;justify-content:space-between;gap:14px;align-items:center;text-align:right;background:none!important}
+  .tw:not(.keep) td::before{content:attr(data-label);color:var(--ink-3);font-size:13px;font-weight:400;text-align:left;flex:0 0 auto;max-width:45%}
+  .tw:not(.keep) td[data-label=""]::before{display:none}
+  .tw:not(.keep) td:empty{display:none}
+  .tw:not(.keep) td.n,.tw:not(.keep) td.nw{white-space:normal}
+  .tw:not(.keep) td .ribbon{flex:1;max-width:60%}
+  .tw:not(.keep) tr.soon{border-color:var(--warn);box-shadow:inset 4px 0 0 var(--warn)}
+  .tw:not(.keep) tr.today{border-color:var(--danger);box-shadow:inset 4px 0 0 var(--danger)}
+  .tw:not(.keep) tr.soon td,.tw:not(.keep) tr.today td{background:none!important}
+  .tw:not(.keep) tr.soon{background:var(--row-soon)}
+  .tw:not(.keep) tr.today{background:var(--row-today)}
+  .tw:not(.keep) td:first-child{font-weight:600}
+  dialog{width:100vw;max-width:100vw;max-height:100dvh;height:100dvh;margin:0;border-radius:0}
+  dialog .mb{padding:14px 14px 20px}
+  dialog .mh{padding:12px 14px;padding-top:calc(12px + env(safe-area-inset-top,0px))}
+  dialog .mf{flex-wrap:wrap;padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px))}
+  dialog .mf .btn{flex:1 1 auto;justify-content:center}
+  .item{grid-template-columns:1fr}
+  .item .r{text-align:left}
+  .item .r .row-actions{justify-content:flex-start!important}
+  .kv{font-size:14px}
+  .lockcard{padding:22px 18px}
+  .tw.keep table{font-size:13px}
+  .tw.keep th,.tw.keep td{padding:8px 6px}
+  #meBox .who{font-size:0;gap:0}
+  #meBox .who img{width:26px;height:26px}
+  .brand{align-items:center}
+  .legend{font-size:12px}
+}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -712,10 +759,10 @@ function mDeal(id){
     ${d.manager?`<dt>Менеджер</dt><dd>${esc(d.manager)}</dd>`:""}<dt>Периодичность</dt><dd>${PERIODS[d.period]||"—"}</dd></dl>
     ${d.note?`<p class="small muted">${esc(d.note)}</p>`:""}
     <h3 style="margin-top:18px">График</h3>
-    <div class="tw"><table><thead><tr><th>№</th><th>Дата</th><th class="n">Сумма</th><th class="n">Внесено</th><th>Статус</th></tr></thead><tbody>
+    <div class="tw keep"><table><thead><tr><th>№</th><th>Дата</th><th class="n">Сумма</th><th class="n">Внесено</th><th>Статус</th></tr></thead><tbody>
     ${c.sched.map(x=>`<tr><td>${x.i}</td><td class="nw">${fmtD(x.due)}</td><td class="n">${rub(x.amount)}</td><td class="n">${x.got?rub(x.got):"—"}</td><td>${stTag(x)}</td></tr>`).join("")}</tbody></table></div>
     <h3 style="margin-top:18px">Платежи</h3>
-    ${c.pays.length?`<div class="tw"><table><thead><tr><th>№</th><th>Дата</th><th class="n">Сумма</th><th class="hide-m">Способ</th><th class="hide-m">Принял</th><th></th></tr></thead><tbody>
+    ${c.pays.length?`<div class="tw keep"><table><thead><tr><th>№</th><th>Дата</th><th class="n">Сумма</th><th class="hide-m">Способ</th><th class="hide-m">Принял</th><th></th></tr></thead><tbody>
     ${c.pays.map(p=>`<tr><td>${esc(p.code)}</td><td class="nw">${fmtD(p.date)}</td><td class="n">${rub(num(p.amount))}</td><td class="hide-m">${esc(p.method||"")}</td><td class="hide-m">${esc(p.who||"")}</td><td class="nw"><button class="btn sm" data-a="receipt" data-id="${p.id}">Квитанция</button> ${D(`<button class="btn sm dng" data-a="del-pay" data-id="${p.id}" data-deal="${d.id}">Удалить</button>`)}</td></tr>`).join("")}</tbody></table></div>`:`<p class="muted small">Платежей пока не было</p>`}
   `,`${canDel()&&!c.pays.length?`<button class="btn dng" data-a="del-deal" data-id="${id}" style="margin-right:auto">Удалить сделку</button>`:""}<button class="btn" data-a="contract" data-id="${id}">Договор PDF</button>${c.remaining>0&&canDel()?`<button class="btn" data-a="early" data-id="${id}">Досрочно</button>`:""}${c.next?waLink(c,c.next,c.next.st==="overdue"):""}${c.remaining>0?W(`<button class="btn pri" data-a="pay" data-id="${id}">Принять платёж</button>`):""}`);
 }
@@ -809,6 +856,14 @@ async function saveCash(){const o=formData();if(!need(o,[["date","Дата"],["a
 /* export */
 
 /* ---------- me / gate / pin ---------- */
+function labelTables(root){
+  (root||document).querySelectorAll(".tw table").forEach(t=>{
+    const heads=[...t.querySelectorAll("thead th")].map(th=>th.textContent.trim());
+    t.querySelectorAll("tbody tr, tfoot tr").forEach(tr=>{let col=0;[...tr.children].forEach(td=>{const span=+td.getAttribute("colspan")||1;
+      if(!td.hasAttribute("data-label"))td.setAttribute("data-label",span>1||tr.parentNode.tagName==="TFOOT"&&col===0?"":(heads[col]||""));col+=span})});
+  });
+}
+new MutationObserver(()=>{labelTables(document.getElementById("app"));labelTables(document.getElementById("dlg"))}).observe(document.body,{childList:true,subtree:true});
 function drawMe(){
   const b=$("#meBox");if(!b)return;
   if(!ME.id||offline||!gateReady){b.innerHTML="";return}
