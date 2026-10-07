@@ -813,7 +813,7 @@ function mNewDeal(clientId,pre){
     ${field("markup","Наценка, ₽",{type:"number",hint:"по ставке "+String(st.rate).replace(".",",")+"% в месяц — можно изменить"})}${field("price","Цена продажи клиенту, ₽",{type:"number",req:1})}
     ${field("period","Периодичность",{type:"select",blank:false,value:"month",options:Object.entries(PERIODS)})}${field("date","Дата сделки",{type:"date",value:todayISO(),req:1})}
     ${field("code","Номер сделки",{value:nextCode("deals","S",3),req:1})}${field("manager","Менеджер / представитель",{value:(ME.id?who(ME.id):"")||people()[1]||people()[0]||"",list:"ppl"})}
-    <details class="inl full gd"><summary>Поручитель <span class="muted">— необязательно</span></summary><div class="form" style="margin-top:12px">${guarFields(null)}</div></details>
+    <details class="inl full gd" ${pre.g?"open":""}><summary>Поручитель <span class="muted">— необязательно</span></summary><div class="form" style="margin-top:12px">${guarFields(pre.g||null)}</div></details>
     ${field("note","Комментарий",{type:"textarea",full:1})}
     <input type="hidden" name="appId" value="${esc(pre.appId||"")}">
     <div class="calc" id="calc"></div>
@@ -1503,6 +1503,7 @@ function appCard(a){
     <div class="ah"><div><div class="t">${esc(a.name)}</div><div class="muted small">${fmtDT(a.created_at)}${a.city?", "+esc(a.city):""}</div></div><span class="tag ${st[1]}">${st[0]}</span></div>
     <dl class="kv"><dt>Телефон</dt><dd><a href="tel:+${ph}">${esc(a.phone)}</a></dd><dt>Товар</dt><dd>${prod}</dd>
     ${a.price?`<dt>Стоимость</dt><dd>${rub(num(a.price))}</dd>`:""}${a.months?`<dt>Взнос и срок</dt><dd>${rub(num(a.down))}, ${a.months} мес.</dd><dt>Платёж</dt><dd class="strong">${rub(num(a.monthly))}</dd>`:""}
+    ${a.g_name?`<dt>Поручитель</dt><dd>${esc(a.g_name)}${a.g_relation?` <span class="muted">(${esc(a.g_relation.toLowerCase())})</span>`:""}${a.g_phone?`<br><a href="tel:+${phoneDigits(a.g_phone)}">${esc(a.g_phone)}</a>`:""}</dd>`:""}
     ${a.comment?`<dt>Комментарий</dt><dd>${esc(a.comment)}</dd>`:""}</dl>
     ${a.photo&&/^data:image\//.test(a.photo)?`<img class="pimg" src="${esc(a.photo)}" alt="Фото товара" data-zoomsrc="1">`:""}
     <input class="anote" data-appnote="${a.id}" value="${esc(a.note||"")}" placeholder="Заметка: о чём договорились" aria-label="Заметка">
@@ -1969,11 +1970,11 @@ document.addEventListener("click",async e=>{
     case "shift":mShift(id,t.dataset.i);break;
     case "save-shift":saveShift(id,t.dataset.i);break;
     case "app-deal":{const ap=APPS.find(x=>x.id===id);if(!ap)break;const cl=ap.client_id&&byId("clients",ap.client_id)?ap.client_id:(findByPhone(ap.phone)||{}).id;
-      mNewDeal(cl||null,{appId:ap.id,nc_name:cl?"":ap.name,nc_phone:cl?"":ap.phone,np_name:ap.product,cost:ap.price||"",down:ap.months?num(ap.down):0,count:ap.months||6})}break;
+      mNewDeal(cl||null,{appId:ap.id,nc_name:cl?"":ap.name,nc_phone:cl?"":ap.phone,np_name:ap.product,cost:ap.price||"",down:ap.months?num(ap.down):0,count:ap.months||6,g:ap.g_name?{name:ap.g_name,phone:ap.g_phone||"",relation:ap.g_relation||""}:null})}break;
     case "app-filter":ui.appFilter=t.dataset.v;draw();break;
     case "app-copy":{const u=appLink();(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>toast("Ссылка скопирована")).catch(()=>toast(u))}break;
     case "app-client":{const ap=APPS.find(x=>x.id===id);if(!ap)break;const ex=findByPhone(ap.phone);if(ex){await appUpdate(ap.id,{client_id:ex.id,status:ap.status==="new"?"work":ap.status},"Такой клиент уже есть — заявка привязана к нему");mClient(ex.id);break}const cid=crypto.randomUUID?crypto.randomUUID():"c"+Date.now().toString(36);
-      const note=["Из заявки: "+ap.product,ap.comment,ap.months?`Расчёт: ${rub(num(ap.price))}, взнос ${rub(num(ap.down))}, ${ap.months} мес. по ${rub(num(ap.monthly))}`:""].filter(Boolean).join(". ");
+      const note=["Из заявки: "+ap.product,ap.comment,ap.g_name?`Поручитель: ${ap.g_name}${ap.g_relation?" ("+ap.g_relation+")":""}${ap.g_phone?", "+ap.g_phone:""}`:"",ap.months?`Расчёт: ${rub(num(ap.price))}, взнос ${rub(num(ap.down))}, ${ap.months} мес. по ${rub(num(ap.monthly))}`:""].filter(Boolean).join(". ");
       if(await save("clients",cid,{code:nextCode("clients","А",1),date:todayISO(),name:ap.name,phone:ap.phone,city:ap.city||"",note})){
         await appUpdate(ap.id,{client_id:cid,status:ap.status==="new"?"work":ap.status},"Клиент создан");
         let tries=0;const op=()=>{if(byId("clients",cid))mClient(cid);else if(++tries<20)setTimeout(op,150)};op()}}break;
