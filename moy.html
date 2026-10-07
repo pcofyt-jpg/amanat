@@ -95,7 +95,7 @@ const dueDate=(start,period,i)=>period==="week"?addDays(start,7*i):period==="biw
 const plural=(n,a,b,c)=>{const m=n%10,k=n%100;return m===1&&k!==11?a:m>=2&&m<=4&&(k<10||k>=20)?b:c};
 const digits=p=>{let d=String(p||"").replace(/\D/g,"");if(d.length===11&&d[0]==="8")d="7"+d.slice(1);return d};
 
-function fail(title,text){$("#main").innerHTML=`<div class="card msg"><h2>${title}</h2><p>${text}</p></div>`;$("#more").innerHTML=""}
+function fail(title,text,tech){$("#main").innerHTML=`<div class="card msg"><h2>${title}</h2><p>${text}</p>${tech?`<p style="font-size:12px;color:#8a9a9b;word-break:break-word">${esc(tech)}</p>`:""}</div>`;$("#more").innerHTML=""}
 
 function render(j){
   const d=j.deal,today=toISO(new Date());
@@ -139,10 +139,12 @@ else if(!window.supabase){fail("Нет связи","Проверьте инте�
 else{
   const SB=window.supabase.createClient(AMANAT_CONFIG.SUPABASE_URL,AMANAT_CONFIG.SUPABASE_ANON_KEY,{auth:{persistSession:false}});
   SB.rpc("client_portal",{p_token:token}).then(({data,error})=>{
-    if(error)return fail("Не удалось загрузить","Проверьте интернет и обновите страницу.");
+    if(error){const code=error.code||"",msg=error.message||"";
+      if(code==="PGRST202"||/client_portal/.test(msg)&&/find|schema cache|not exist/i.test(msg))return fail("Кабинет ещё не включён","Администратору: выполните файл kabinet.sql в Supabase (SQL Editor → Run).",code+" "+msg);
+      return fail("Не удалось загрузить","Обновите страницу. Если не поможет — сообщите менеджеру AMANA текст ниже.",(code?code+": ":"")+msg)}
     if(!data||!data.deal)return fail("Ссылка недействительна","Возможно, её заменили на новую. Попросите менеджера AMANA прислать актуальную ссылку.");
     render(data);
-  },()=>fail("Нет связи","Проверьте интернет и обновите страницу."));
+  },e=>fail("Нет связи","Проверьте интернет и обновите страницу.",String(e&&e.message||e)));
 }
 })();
 </script>

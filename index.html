@@ -222,6 +222,8 @@ dialog::backdrop{background:rgba(10,20,20,.45)}
 .f textarea{min-height:70px;resize:vertical}
 .f .hint{font-size:12px;color:var(--ink-3)}
 .mv{margin-left:5px;color:var(--brass);font-weight:700;cursor:help}
+.gd summary{cursor:pointer;font-weight:600;color:var(--primary)}
+.gd summary .muted{font-weight:400}
 .inl{grid-column:1/-1;border:1px dashed var(--line);border-radius:12px;padding:12px;background:var(--surface)}
 .inl[hidden]{display:none}
 .calc{grid-column:1/-1;background:var(--primary-soft);border-radius:10px;padding:12px 14px;font-size:14px}
@@ -611,7 +613,7 @@ function waLink(c,x,late){
 function vDeals(deals){
   const q=ui.q.trim().toLowerCase();
   const f=ui.dealFilter;
-  const list=deals.filter(({d,c})=>(f==="all"||c.status===f)&&(!q||[d.code,c.client&&c.client.name,c.product&&c.product.name,c.product&&c.product.model,d.manager].join(" ").toLowerCase().includes(q)));
+  const list=deals.filter(({d,c})=>(f==="all"||c.status===f)&&(!q||[d.code,c.client&&c.client.name,c.client&&c.client.phone,c.product&&c.product.name,c.product&&c.product.model,d.manager,d.guarantor&&d.guarantor.name,d.guarantor&&d.guarantor.phone].join(" ").toLowerCase().includes(q)));
   const chips=[["all","Все"],["active","В процессе"],["overdue","Просрочка"],["closed","Закрытые"]];
   return `<div class="head"><h2>Сделки</h2><div class="filters">${chips.map(([k,l])=>`<button class="chip" data-a="filter" data-v="${k}" aria-pressed="${f===k}">${l}</button>`).join("")}<input id="q" class="search" placeholder="Поиск: клиент, товар, номер" value="${esc(ui.q)}">${W(`<button class="btn pri" data-a="new-deal">Новая сделка</button>`)}</div></div>
   ${list.length?`<div class="tw"><table><thead><tr><th>№</th><th>Клиент</th><th class="hide-m">Товар</th><th>График</th><th class="n">Цена</th><th class="n">Остаток</th><th>След. платёж</th><th>Статус</th></tr></thead><tbody>
@@ -730,7 +732,7 @@ function mClient(id){
     ${field("name","ФИО",{value:c.name,req:1,full:1})}
     ${field("phone","Телефон",{value:c.phone,type:"tel",ph:"+7 928 000-00-00"})}${field("city","Город",{value:c.city})}
     ${field("address","Адрес",{value:c.address,full:1})}
-    ${field("passport","Паспорт",{value:c.passport,ph:"серия и номер"})}${field("guarantor","Поручитель",{value:c.guarantor,ph:"ФИО и телефон"})}
+    ${field("passport","Паспорт",{value:c.passport,ph:"серия и номер"})}${field("guarantor","Поручитель (старое поле)",{value:c.guarantor,ph:"лучше указывать в сделке",hint:"Поручителя с телефоном добавляйте в сделке"})}
     ${field("note","Комментарий",{type:"textarea",value:c.note,full:1})}
   </div>`,footSave("save-client",id,id&&!S.deals.some(d=>d.clientId===id)?"del-client":null)+(id?`<button class="btn" data-a="new-deal" data-client="${id}">Новая сделка</button>`:""));
   if(id)dlg.dataset.client=id;
@@ -811,6 +813,7 @@ function mNewDeal(clientId,pre){
     ${field("markup","Наценка, ₽",{type:"number",hint:"по ставке "+String(st.rate).replace(".",",")+"% в месяц — можно изменить"})}${field("price","Цена продажи клиенту, ₽",{type:"number",req:1})}
     ${field("period","Периодичность",{type:"select",blank:false,value:"month",options:Object.entries(PERIODS)})}${field("date","Дата сделки",{type:"date",value:todayISO(),req:1})}
     ${field("code","Номер сделки",{value:nextCode("deals","S",3),req:1})}${field("manager","Менеджер / представитель",{value:(ME.id?who(ME.id):"")||people()[1]||people()[0]||"",list:"ppl"})}
+    <details class="inl full gd"><summary>Поручитель <span class="muted">— необязательно</span></summary><div class="form" style="margin-top:12px">${guarFields(null)}</div></details>
     ${field("note","Комментарий",{type:"textarea",full:1})}
     <input type="hidden" name="appId" value="${esc(pre.appId||"")}">
     <div class="calc" id="calc"></div>
@@ -847,6 +850,7 @@ async function saveDeal(){
   if(o.clientId==="__new"){if(o.nc_name.length<2)return showErr("Укажите имя нового клиента");const dup=findByPhone(o.nc_phone);if(dup)return showErr(`Клиент с таким телефоном уже есть: ${dup.name} (${dup.code}). Выберите его в списке клиентов.`)}
   if(o.productId==="__new"){if(o.np_name.length<2)return showErr("Укажите, какой товар купили");if(num(o.np_cost)<=0)return showErr("Укажите закупочную цену товара");if(!o.np_date)return showErr("Укажите дату покупки товара")}
   if(S.deals.some(d=>d.code===o.code))return showErr("Такой номер сделки уже есть");
+  const gu=guarFrom(o);if(!gu.name&&(gu.phone||gu.passport||gu.address))return showErr("Укажите ФИО поручителя");
   const price=num(o.price),down=num(o.down),n=Math.round(num(o.count)),cost=dealCost(o);
   if(n<1||n>120)return showErr("Количество платежей от 1 до 120");
   if(price<=0)return showErr("Укажите цену продажи");
@@ -861,6 +865,7 @@ async function saveDeal(){
     if(productId==="__new"){productId=uid();if(!(await save("products",productId,{code:nextCode("products","T",3),category:"",name:o.np_name,model:"",serial:o.np_serial,cost:num(o.np_cost),date:o.np_date,supplier:"",fromCash:o.np_cash!=="no"})))return}
     if(clientId==="__new"){clientId=uid();if(!(await save("clients",clientId,{code:nextCode("clients","А",1),date:todayISO(),name:o.nc_name,phone:o.nc_phone,city:""})))return}
     const d={code:o.code,date:o.date,clientId,productId,cost,price,down,count:o.period==="once"?1:n,period:o.period,manager:o.manager,note:o.note,createdAt:new Date().toISOString()};
+    if(gu.name)d.guarantor=gu;
     if(await save("deals",null,d)){
       if(o.appId&&SB)appUpdate(o.appId,{client_id:clientId,status:"approved"});
       closeModal();toast("Сделка оформлена, график построен");
@@ -880,12 +885,13 @@ function mDeal(id){
     ${c.down?`<dt>Первый взнос</dt><dd>${rub(c.down)}</dd>`:""}
     ${c.waived?`<dt>Скидка при досрочном погашении (ибра)</dt><dd>${rub(c.waived)}</dd>`:""}
     <dt>Получено всего</dt><dd>${rub(c.received)}</dd><dt class="strong">Остаток долга</dt><dd class="strong">${rub(c.remaining)}</dd>
+    ${guarHTML(d,c)}
     ${d.manager?`<dt>Менеджер</dt><dd>${esc(d.manager)}</dd>`:""}<dt>Периодичность</dt><dd>${PERIODS[d.period]||"—"}</dd></dl>
     ${d.note?`<p class="small muted">${esc(d.note)}</p>`:""}
     <h3 style="margin-top:18px">График</h3>
     <div class="tw keep"><table><thead><tr><th>№</th><th>Дата</th><th class="n">Сумма</th><th class="n hide-m">Внесено</th><th>Статус</th></tr></thead><tbody>
     ${c.sched.map(x=>`<tr><td>${x.i}</td><td class="nw">${fmtD(x.due)}${x.moved?`<span class="mv" title="Срок перенесён" aria-label="перенесён">↷</span>`:""}</td><td class="n">${rub(x.amount)}</td><td class="n hide-m">${x.got?rub(x.got):"—"}</td><td>${stTag(x)}</td></tr>`).join("")}</tbody></table></div>
-    ${canDel()?`<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">${c.remaining>0?`<button class="btn sm" data-a="shift" data-id="${d.id}">Перенести платёж</button>`:""}<button class="btn sm" data-a="portal" data-id="${d.id}">Ссылка клиенту на график</button>${c.sched.some(x=>x.moved)?`<span class="small muted">↷ — срок перенесён</span>`:""}</div>`:""}
+    ${canDel()?`<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">${c.remaining>0?`<button class="btn sm" data-a="shift" data-id="${d.id}">Перенести платёж</button>`:""}<button class="btn sm" data-a="portal" data-id="${d.id}">Ссылка клиенту на график</button><button class="btn sm" data-a="guar" data-id="${d.id}">${d.guarantor&&d.guarantor.name?"Изменить поручителя":"Добавить поручителя"}</button>${c.sched.some(x=>x.moved)?`<span class="small muted">↷ — срок перенесён</span>`:""}</div>`:""}
     ${(d.shiftLog||[]).length?`<p class="small muted" style="margin:6px 0 0">Переносы: ${d.shiftLog.map(s=>`№${s.i} ${fmtD(s.from)} → ${fmtD(s.to)}${s.all?" и следующие":""}${s.reason?" ("+esc(s.reason)+")":""}`).join("; ")}</p>`:""}
     <h3 style="margin-top:18px">Платежи</h3>
     ${c.pays.length?`<div class="tw keep"><table><thead><tr><th>№</th><th>Дата</th><th class="n">Сумма</th><th class="hide-m">Способ</th><th class="hide-m">Принял</th><th></th></tr></thead><tbody>
@@ -1458,6 +1464,25 @@ async function mPortal(dealId,regen){
     `<button class="btn dng" data-a="portal-new" data-id="${d.id}" style="margin-right:auto">Новая ссылка</button><button class="btn" data-a="portal-copy" data-v="${esc(url)}">Скопировать</button>${ph?`<a class="btn pri" target="_blank" rel="noopener" href="https://wa.me/${ph}?text=${encodeURIComponent(txt)}">Отправить в WhatsApp</a>`:""}`);
 }
 
+
+/* ---------- поручитель ---------- */
+const REL=["Брат","Сестра","Отец","Мать","Супруг(а)","Сын","Дочь","Дядя","Родственник","Друг","Коллега"];
+function guarOf(d,cl){if(d&&d.guarantor&&d.guarantor.name)return d.guarantor;cl=cl||(d&&byId("clients",d.clientId));return cl&&cl.guarantor?{name:cl.guarantor,legacy:true}:null}
+function guarFields(g,pre){g=g||{};pre=pre||"g_";return `${field(pre+"name","ФИО поручителя",{value:g.name||"",full:1})}
+  ${field(pre+"phone","Телефон поручителя",{value:g.phone||"",type:"tel",ph:"+7 928 000-00-00"})}${field(pre+"relation","Кем приходится клиенту",{value:g.relation||"",list:"rel"})}
+  ${field(pre+"passport","Паспорт поручителя",{value:g.passport||"",ph:"серия и номер, кем и когда выдан"})}${field(pre+"address","Адрес поручителя",{value:g.address||""})}${datalist("rel",REL)}`}
+function guarFrom(o,pre){pre=pre||"g_";const g={name:(o[pre+"name"]||"").trim(),phone:(o[pre+"phone"]||"").trim(),relation:(o[pre+"relation"]||"").trim(),passport:(o[pre+"passport"]||"").trim(),address:(o[pre+"address"]||"").trim()};return g}
+function guarHTML(d,c){const g=guarOf(d,c.client);if(!g)return "";const ph=phoneDigits(g.phone);
+  const late=c.overdue>0&&c.next;const txt=late?`Ассаляму алейкум${g.name?", "+g.name:""}! Вы поручитель по рассрочке ${c.client?c.client.name:""} в AMANA (договор ${d.code}). Платёж от ${fmtD(c.next.due)} на ${rub(c.next.left)} пока не поступил, а клиент не выходит на связь. Будем благодарны, если поможете. Проценты и штрафы не начисляются.`:`Ассаляму алейкум${g.name?", "+g.name:""}! Пишем из AMANA по договору ${d.code}.`;
+  return `<dt>Поручитель</dt><dd>${esc(g.name)}${g.relation?` <span class="muted">(${esc(g.relation.toLowerCase())})</span>`:""}${g.phone?`<br><a href="tel:+${ph}">${esc(g.phone)}</a>${ph?` · <a href="https://wa.me/${ph}?text=${encodeURIComponent(txt.replace(/[\u00a0\u202f]/g," "))}" target="_blank" rel="noopener">WhatsApp</a>`:""}`:""}</dd>`}
+function mGuarantor(dealId){const d=byId("deals",dealId);if(!d)return;const g=d.guarantor&&d.guarantor.name?d.guarantor:{};
+  openModal(`Поручитель · ${esc(d.code)}`,`<div class="form">${guarFields(g)}<div class="note">Поручитель отвечает за долг вместе с клиентом, если тот перестанет платить. Он подписывает договор вместе с клиентом — распечатайте договор заново после изменения.</div></div>`,
+  `${g.name?`<button class="btn dng" data-a="guar-del" data-id="${d.id}" style="margin-right:auto">Убрать</button>`:""}<button class="btn" data-a="close">Отмена</button><button class="btn pri" data-a="guar-save" data-id="${d.id}">Сохранить</button>`)}
+async function saveGuarantor(dealId,remove){const d=byId("deals",dealId);if(!d)return;const o=formData();const g=remove?null:guarFrom(o);
+  if(g&&g.name.length<2)return showErr("Укажите ФИО поручителя");
+  const data={...strip(d)};if(g)data.guarantor=g;else delete data.guarantor;
+  if(await save("deals",d.id,data)){toast(g?"Поручитель сохранён":"Поручитель убран");setTimeout(()=>mDeal(d.id),300)}}
+
 /* ---------- applications (заявки) ---------- */
 let APPS=[],appsSub=false,appsLoaded=false;
 const appsNew=()=>APPS.filter(a=>a.status==="new").length;
@@ -1621,7 +1646,12 @@ function contractPDF(id){
   P("4.2. Если Покупатель оказался в затруднительном положении, Продавец по его просьбе вправе перенести сроки платежей. Цена Товара при этом не изменяется, дополнительная плата за отсрочку не взимается.");
   P("4.3. Стороны обязуются решать споры путём переговоров. При недостижении согласия спор разрешается в порядке, установленном законодательством Российской Федерации.");
   let s=5;
-  if(cl.guarantor){H2(`${s}. Поручительство`);P(`${s}.1. Исполнение обязательств Покупателя по настоящему договору обеспечивается поручительством: ${cl.guarantor}.`);s++}
+  const gu=guarOf(d,cl);
+  if(gu&&gu.legacy){H2(`${s}. Поручительство`);P(`${s}.1. Исполнение обязательств Покупателя по настоящему договору обеспечивается поручительством: ${gu.name}.`);s++}
+  else if(gu){H2(`${s}. Поручительство`);
+    P(`${s}.1. Исполнение обязательств Покупателя по настоящему договору обеспечивается поручительством ${gu.name}${gu.passport?", паспорт "+gu.passport:""}${gu.address?", адрес: "+gu.address:""}${gu.phone?", тел. "+gu.phone:""} (далее — «Поручитель»).`);
+    P(`${s}.2. Поручитель отвечает перед Продавцом солидарно с Покупателем за исполнение обязательств по оплате Товара в пределах суммы задолженности по настоящему договору. Проценты, пени и штрафы на Поручителя не начисляются.`);
+    P(`${s}.3. Поручитель ознакомлен с условиями настоящего договора и графиком платежей и согласен отвечать за их исполнение, что подтверждает своей подписью.`);s++}
   H2(`${s}. Заключительные положения`);
   P(`${s}.1. Договор вступает в силу с момента подписания и действует до полного исполнения сторонами своих обязательств.`);
   P(`${s}.2. Договор составлен в двух экземплярах, имеющих одинаковую силу, по одному для каждой из сторон.`);
@@ -1629,7 +1659,8 @@ function contractPDF(id){
   H2(`${s+1}. Реквизиты и подписи сторон`);doc.gap(4);
   const sigs=()=>doc.two(["Продавец",co.name||B,co.inn?"ИНН "+co.inn:"",co.ogrn?"ОГРН "+co.ogrn:"",co.address||"",co.phone?"Тел. "+co.phone:"","","____________ / "+(co.signerShort||"____________")+" /"].filter((x,i)=>x!==""||i===6),
     ["Покупатель",cl.name||B,cl.passport?"Паспорт "+cl.passport:"Паспорт "+B,cl.address||"Адрес "+B,cl.phone?"Тел. "+cl.phone:"","","____________ / "+(cl.name||"____________")+" /"].filter((x,i)=>x!==""||i===5));
-  sigs();
+  const gsig=()=>{if(gu&&!gu.legacy){doc.gap(6);doc.two(["Поручитель",gu.name,gu.passport?"Паспорт "+gu.passport:"Паспорт "+B,gu.address||"Адрес "+B,gu.phone?"Тел. "+gu.phone:"","","____________ / "+gu.name+" /"].filter((x,i)=>x!==""||i===5),[])}};
+  sigs();gsig();
   doc.add();
   doc.text(`Приложение № 1 к договору № ${d.code} от ${fmtD(d.date)}`,{size:9,align:"right",gap:6});
   doc.text("ГРАФИК ПЛАТЕЖЕЙ",{size:13,bold:true,align:"center",gap:2});
@@ -1639,7 +1670,7 @@ function contractPDF(id){
   rows.push({cells:["","","Итого",rub(c.price),""],bold:true});
   doc.table([{t:"№",w:30,a:"c"},{t:"Дата платежа",w:90},{t:"Назначение",w:150},{t:"Сумма",w:90,a:"r"},{t:"Отметка об оплате",w:130}],rows,{size:9.5});
   doc.text("Проценты, пени и штрафы за просрочку не начисляются.",{size:9,gap:14});
-  sigs();
+  sigs();gsig();
   savePdf(doc.bytes("AMANA · договор "+d.code),`Договор_${d.code}_${(cl.name||"").replace(/\s+/g,"_")}.pdf`);
   logIt("Создал","deals","Договор PDF по сделке "+d.code);
 }
@@ -1894,7 +1925,7 @@ function exportXlsx(isBackup){
   const deals=allDeals();
   add("Клиенты",S.clients.map(c=>{const s=clientStats(c);return {"ID":c.code,"ФИО":c.name,"Телефон":c.phone||"","Город":c.city||"","Адрес":c.address||"","Поручитель":c.guarantor||"","Сделок":s.ds.length,"Сумма покупок":s.total,"Оплачено":s.paid,"Остаток":s.debt,"Просрочено":s.od}}));
   add("Товары",S.products.map(p=>{const st=productStatus(p);return {"ID":p.code,"Категория":p.category||"","Наименование":p.name,"Модель":p.model||"","IMEI":p.serial||"","Себестоимость":num(p.cost),"Дата покупки":fmtD(p.date),"Поставщик":p.supplier||"","Статус":st.sold?"Продан":"На складе","Сделка":st.sold?st.deal.code:""}}));
-  add("Рассрочки",deals.map(({d,c})=>({"ID":d.code,"Дата":fmtD(d.date),"Клиент":c.client?c.client.name:"","Товар":c.product?[c.product.name,c.product.model].join(" "):"","Себестоимость":c.cost,"Цена":c.price,"Первый взнос":c.down,"Получено":c.received,"Остаток":c.remaining,"Наценка":c.markup,"Платежей":c.n,"Периодичность":PERIODS[d.period],"След. платёж":c.next?fmtD(c.next.due):"","Просрочено":c.overdue,"Статус":c.status==="closed"?"Закрыта":c.status==="overdue"?"Просрочка":"В процессе","Менеджер":d.manager||""})));
+  add("Рассрочки",deals.map(({d,c})=>({"ID":d.code,"Дата":fmtD(d.date),"Клиент":c.client?c.client.name:"","Товар":c.product?[c.product.name,c.product.model].join(" "):"","Себестоимость":c.cost,"Цена":c.price,"Первый взнос":c.down,"Получено":c.received,"Остаток":c.remaining,"Наценка":c.markup,"Платежей":c.n,"Периодичность":PERIODS[d.period],"След. платёж":c.next?fmtD(c.next.due):"","Просрочено":c.overdue,"Статус":c.status==="closed"?"Закрыта":c.status==="overdue"?"Просрочка":"В процессе","Менеджер":d.manager||"","Поручитель":(guarOf(d,c.client)||{}).name||"","Тел. поручителя":(d.guarantor&&d.guarantor.phone)||""})));
   const g=[];deals.forEach(({d,c})=>c.sched.forEach(x=>g.push({"Сделка":d.code,"Клиент":c.client?c.client.name:"","№":x.i,"Дата":fmtD(x.due),"Сумма":x.amount,"Внесено":x.got,"Остаток":x.left,"Статус":{paid:"Оплачен",overdue:"Просрочен",partial:"Частично",upcoming:"Ожидается"}[x.st]})));add("График",g);
   add("Платежи",S.payments.map(p=>{const d=byId("deals",p.dealId);const c=d&&byId("clients",d.clientId);return {"ID":p.code,"Дата":fmtD(p.date),"Сделка":d?d.code:"","Клиент":c?c.name:"","Сумма":num(p.amount),"Способ":p.method||"","Принял":p.who||""}}));
   add("Касса",cashLedger().ops.map(o=>({"Дата":fmtD(o.date),"Операция":o.what,"Приход":o.in||0,"Расход":o.out||0,"Остаток":o.bal})));
@@ -1926,6 +1957,9 @@ document.addEventListener("click",async e=>{
     case "mk-auto":dealCalcPreview("auto");break;
     case "paid":mPaid(id);break;
     case "portal":mPortal(id);break;
+    case "guar":mGuarantor(id);break;
+    case "guar-save":saveGuarantor(id);break;
+    case "guar-del":saveGuarantor(id,true);break;
     case "portal-new":mPortal(id,true);break;
     case "portal-copy":{const u=t.dataset.v;(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>toast("Ссылка скопирована")).catch(()=>toast(u))}break;
     case "app-qr":mQr();break;
