@@ -933,7 +933,13 @@ async function savePay(){
 /* loan / partner */
 function mPartner(id){
   const p=id?byId("partners",id):{};
-  openModal(id?esc(p.name):"Новый партнёр",`<div class="form">
+  let hist="";
+  if(id){const ls=S.loans.filter(l=>l.partnerId===id).sort((a,b)=>(a.date||"").localeCompare(b.date||""));
+    const given=ls.reduce((s,l)=>s+num(l.amount),0),back=ls.reduce((s,l)=>s+(l.returns||[]).reduce((a,r)=>a+num(r.amount),0),0);
+    hist=`<div class="panel" style="margin-bottom:16px;padding:12px 14px"><dl class="kv"><dt>Внёс всего</dt><dd>${rub(given)}</dd><dt>Возвращено</dt><dd>${rub(back)}</dd><dt class="strong">Сейчас должны ему</dt><dd class="strong">${rub(given-back)}</dd></dl>
+      ${ls.length?`<div class="list" style="margin-top:10px">${ls.map(l=>{const b=(l.returns||[]).reduce((a,r)=>a+num(r.amount),0);return `<div class="item click" data-a="loan" data-id="${l.id}"><div><div class="t">${esc(l.code)} · ${fmtD(l.date)}</div><div class="s">${l.kind==="capital"?"вклад в капитал":"займ"}${l.purpose?" · "+esc(l.purpose):""}</div></div><div class="r"><div class="amt">${rub(num(l.amount))}</div>${b?`<div class="s">возвращено ${rub(b)}</div>`:""}</div></div>`}).join("")}</div>`:""}
+      ${W(`<div class="row-actions" style="margin-top:10px"><button class="btn pri sm" data-a="loan-more" data-id="${id}">Внести ещё деньги</button></div>`)}</div>`}
+  openModal(id?esc(p.name):"Новый партнёр",hist+`<div class="form">
     ${field("name","Имя",{value:p.name,req:1})}${field("phone","Телефон",{value:p.phone,type:"tel"})}
     ${field("role","Роль",{value:p.role,list:"roles",full:1})}
     ${field("kind","Участие в деньгах",{type:"select",blank:false,value:p.kind||"lender",options:[["lender","Даёт займ (без доли в прибыли)"],["partner","Партнёр с долей в прибыли"]]})}${field("share","Доля в прибыли, %",{type:"number",value:p.share||"",hint:"только для партнёра с долей"})}
@@ -943,11 +949,12 @@ function mPartner(id){
     footSave("save-partner",id,id&&!S.loans.some(l=>l.partnerId===id)?"del-partner":null));
 }
 async function savePartner(id){const o=formData();if(!need(o,[["name","Имя"]]))return;o.share=o.kind==="partner"?num(o.share):0;if(o.share<0||o.share>100)return showErr("Доля от 0 до 100%");const others=S.partners.filter(x=>x.id!==id).reduce((s,x)=>s+num(x.share),0);if(others+o.share>100)return showErr("Сумма долей всех партнёров больше 100% (уже распределено "+others+"%)");if(await save("partners",id||null,o)){closeModal();toast("Сохранено")}}
-function mLoan(id){
+function mLoan(id,pid){
   if(!S.partners.length){openModal("Займ",`<p>Сначала добавьте партнёра, от которого пришли деньги.</p>`,`<button class="btn" data-a="close">Отмена</button>${W(`<button class="btn pri" data-a="new-partner">Добавить партнёра</button>`)}`);return}
-  const l=id?byId("loans",id):{code:nextCode("loans","L",3),date:todayISO()};
+  const pp=pid&&byId("partners",pid);
+  const l=id?byId("loans",id):{code:nextCode("loans","L",3),date:todayISO(),partnerId:pid||"",kind:pp&&pp.kind==="partner"?"capital":"qard"};
   const back=(l.returns||[]).reduce((a,r)=>a+num(r.amount),0);
-  openModal(id?esc(l.code)+" · "+esc(partnerName(l.partnerId)):"Новый займ",`<div class="form">
+  openModal(id?esc(l.code)+" · "+esc(partnerName(l.partnerId)):pp?"Новый взнос · "+esc(pp.name):"Новый займ",`<div class="form">
     ${field("code","ID займа",{value:l.code,req:1})}${field("date","Дата",{type:"date",value:l.date,req:1})}
     ${field("partnerId","Кто дал",{type:"select",req:1,value:l.partnerId,options:S.partners.map(p=>[p.id,p.name])})}${field("amount","Сумма, ₽",{type:"number",value:l.amount,req:1})}
     ${field("kind","Вид",{type:"select",blank:false,value:l.kind||"qard",options:[["qard","Займ без процентов (кард аль-хасан)"],["capital","Вклад в капитал (с долей в прибыли и риске)"]],full:1})}
@@ -2022,6 +2029,7 @@ document.addEventListener("click",async e=>{
     case "new-product":mProduct();break;
     case "new-partner":mPartner();break;
     case "new-loan":mLoan();break;
+    case "loan-more":mLoan(null,id);break;
     case "new-expense":mExpense();break;
     case "new-cash":mCash();break;
     case "new-pay":mPay();break;
