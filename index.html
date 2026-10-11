@@ -224,6 +224,24 @@ dialog::backdrop{background:rgba(10,20,20,.45)}
 .mv{margin-left:5px;color:var(--brass);font-weight:700;cursor:help}
 .gd summary{cursor:pointer;font-weight:600;color:var(--primary)}
 .gd summary .muted{font-weight:400}
+.fcgrid{display:grid;gap:18px;grid-template-columns:minmax(0,340px) minmax(0,1fr);grid-template-areas:"cond out" "cond table";align-items:start}
+.fcgrid .fc-cond{grid-area:cond;margin:0}.fcgrid #fcOut{grid-area:out}.fcgrid #fcTable{grid-area:table}
+.fcgrid #fcOut .panel,.fcgrid #fcTable .panel{margin:0}
+@media (max-width:860px){.fcgrid{grid-template-columns:1fr;grid-template-areas:"out" "cond" "table"}}
+.fcf{margin-bottom:14px}
+.fcl{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:14px}
+.fcv{white-space:nowrap;color:var(--ink-2)}
+.fcv input{width:92px;text-align:right;border:1px solid var(--line);background:var(--surface-2);border-radius:8px;padding:5px 8px;color:var(--ink);font-weight:600}
+.fcf input[type=range]{width:100%;accent-color:var(--primary);margin-top:6px}
+.fcf .hint{font-size:12px;color:var(--ink-3)}
+.fctiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.fctiles>div{background:var(--surface-2);border-radius:12px;padding:10px 12px}
+.fctiles .l{font-size:12px;color:var(--ink-3)}
+.fctiles .v{font-family:Unbounded,"Golos Text",sans-serif;font-weight:700;font-size:clamp(15px,2vw,19px);color:var(--primary);margin-top:4px}
+@media (max-width:640px){.fctiles{grid-template-columns:1fr 1fr}}
+.fcleg{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--ink-2);margin-top:6px}
+.fcleg i{display:inline-block;width:18px;height:4px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.fcleg i.dash{background:repeating-linear-gradient(90deg,var(--brass) 0 6px,transparent 6px 10px)}
 .inl{grid-column:1/-1;border:1px dashed var(--line);border-radius:12px;padding:12px;background:var(--surface)}
 .inl[hidden]{display:none}
 .calc{grid-column:1/-1;background:var(--primary-soft);border-radius:10px;padding:12px 14px;font-size:14px}
@@ -372,8 +390,8 @@ const COLS=["clients","products","deals","payments","loans","partners","expenses
 const comp=()=>S.company.find(x=>x.id==="main")||{};
 const S={}; COLS.forEach(c=>S[c]=[]);
 let db=null, userCap=null, downloads=null, ME={id:null,isOwner:false,name:"",avatarUrl:""}, SETTINGS={roles:{},requirePin:false}, MEMBERS=[], LOG=[], NAMES={}, PIN=null, gateReady=false, unlocked=false, pinFails=0, pinBlockUntil=0, canWrite=true, loaded=new Set(), offline=false;
-const TABS=[["home","Сводка"],["apps","Заявки"],["calc","Калькулятор"],["deals","Сделки"],["clients","Клиенты"],["products","Товары"],["cash","Касса"],["capital","Займы и партнёры"],["expenses","Расходы"],["reports","Отчёты"],["zakat","Закят"],["log","Журнал"],["access","Доступ"],["rules","Правила"]];
-const FULL_ONLY=["cash","capital","reports","log","zakat"];
+const TABS=[["home","Сводка"],["apps","Заявки"],["calc","Калькулятор"],["deals","Сделки"],["clients","Клиенты"],["products","Товары"],["cash","Касса"],["capital","Займы и партнёры"],["expenses","Расходы"],["reports","Отчёты"],["forecast","Прогноз"],["zakat","Закят"],["log","Журнал"],["access","Доступ"],["rules","Правила"]];
+const FULL_ONLY=["cash","capital","reports","forecast","log","zakat"];
 const visTabs=()=>TABS.filter(([k])=>(isFull()||!FULL_ONLY.includes(k))&&(k!=="apps"||(canAdd()&&!offline)));
 let tab="home"; try{tab=localStorage.getItem("amanat-tab")||"home"}catch(e){}
 if(!TABS.some(t=>t[0]===tab)) tab="home";
@@ -529,10 +547,11 @@ function draw(){
   if(offline) h+=`<div class="banner">Нет связи с базой данных. Проверьте интернет и настройки Supabase в начале файла index.html.</div>`;
   else if(!canWrite) h+=`<div class="banner">У вас доступ только для просмотра. Попросите владельца выдать права на изменение.</div>`;
   else if(role()==="view") h+=`<div class="banner">Ваша роль — «Просмотр»: вносить изменения нельзя.</div>`;
-  const V={apps:vApps,calc:vCalc,zakat:vZakat,log:vLog,access:vAccess,home:vHome,deals:vDeals,clients:vClients,products:vProducts,cash:vCash,capital:vCapital,expenses:vExpenses,reports:vReports,rules:vRules};
+  const V={forecast:vForecast,apps:vApps,calc:vCalc,zakat:vZakat,log:vLog,access:vAccess,home:vHome,deals:vDeals,clients:vClients,products:vProducts,cash:vCash,capital:vCapital,expenses:vExpenses,reports:vReports,rules:vRules};
   h+=V[tab](deals);
   const app=$("#app"); const y=window.scrollY; app.innerHTML=h; window.scrollTo(0,y);
   if(tab==="calc")updateCalc();
+  if(tab==="forecast")updateForecast();
   const s=$("#q"); if(s&&ui.focusQ){s.focus();s.setSelectionRange(s.value.length,s.value.length)}
 }
 function W(html){return canAdd()?html:""}
@@ -1240,11 +1259,11 @@ async function shareCalc(){
 /* ---------- navigation ---------- */
 const IC={home:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>',deals:'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>',apps:'<path d="M4 6h16v10H8l-4 4z"/>',more:'<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>',plus:'<path d="M12 5v14M5 12h14"/>',
   calc:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/>',clients:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>',products:'<path d="M3 7l9-4 9 4-9 4z"/><path d="M3 7v10l9 4 9-4V7"/>',cash:'<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>',
-  capital:'<path d="M12 3v18M7 7h7.5a3 3 0 010 6H9a3 3 0 000 6h8"/>',expenses:'<path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h4"/>',reports:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',zakat:'<path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.5L12 15.6 7.1 18.2 8 12.7 4 8.8l5.5-.8z"/>',
+  capital:'<path d="M12 3v18M7 7h7.5a3 3 0 010 6H9a3 3 0 000 6h8"/>',expenses:'<path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h4"/>',reports:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',forecast:'<path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/>',zakat:'<path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.5L12 15.6 7.1 18.2 8 12.7 4 8.8l5.5-.8z"/>',
   log:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>',access:'<rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/>',rules:'<path d="M4 4h12a4 4 0 014 4v12H8a4 4 0 01-4-4z"/><path d="M8 9h8M8 13h6"/>',
   pay:'<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18M7 15h3"/>',newdeal:'<path d="M12 5v14M5 12h14"/>',expense:'<path d="M12 4v16M17 9l-5-5-5 5"/>'};
 const svgI=k=>`<svg viewBox="0 0 24 24" aria-hidden="true">${IC[k]||""}</svg>`;
-const PRIMARY=["home","apps","calc","deals","clients","products","cash","expenses","reports"];
+const PRIMARY=["home","apps","calc","deals","clients","products","cash","expenses","reports","forecast"];
 const BOTTOM=["home","deals","apps"];
 function navHTML(od){
   const vis=visTabs();const lab=k=>(vis.find(t=>t[0]===k)||[])[1];
@@ -1489,6 +1508,83 @@ async function saveGuarantor(dealId,remove){const d=byId("deals",dealId);if(!d)r
   if(g&&g.name.length<2)return showErr("Укажите ФИО поручителя");
   const data={...strip(d)};if(g)data.guarantor=g;else delete data.guarantor;
   if(await save("deals",d.id,data)){toast(g?"Поручитель сохранён":"Поручитель убран");setTimeout(()=>mDeal(d.id),300)}}
+
+
+/* ---------- прогноз дохода ---------- */
+const FC_DEF={check:80000,downPct:15,months:6,add:50000,maxDeals:4,take:0,late:10,exp:0,horizon:12};
+const MON=["янв","фев","мар","апр","май","июн","июл","авг","сен","окт","ноя","дек"];
+function fcState(){if(!ui.fc){let s={};try{s=JSON.parse(localStorage.getItem("amana-fc")||"{}")}catch(e){}
+  if(s.exp===undefined){const t=todayISO(),from=addMonths(t,-3);s.exp=Math.round(S.expenses.filter(e=>e.date>=from&&e.date<=t).reduce((a,e)=>a+num(e.amount),0)/3/1000)*1000}
+  ui.fc={...FC_DEF,...s}}return ui.fc}
+function fcSave(){try{localStorage.setItem("amana-fc",JSON.stringify(ui.fc))}catch(e){}}
+const monIdx=iso=>{const [y,m]=iso.split("-").map(Number);const [y0,m0]=todayISO().split("-").map(Number);return (y-y0)*12+(m-m0)};
+function fcRun(p,take){
+  const H=p.horizon,rate=calcSettings().rate,late=p.late/100,RL=H+130,rc=new Array(RL).fill(0).map(()=>[]);
+  const put=(i,amt,ratio)=>{if(i<0)i=0;if(i<RL)rc[i].push([amt*(1-late),ratio]);if(i+1<RL&&late)rc[i+1].push([amt*late,ratio])};
+  S.deals.forEach(d=>{const c=dealCalc(d);if(c.remaining<=0)return;const ratio=c.price?(c.price-c.cost)/c.price:0;c.sched.forEach(x=>{if(x.left>0)put(monIdx(x.due),x.left,ratio)})});
+  let cash=cashLedger().bal;const rows=[];const now=todayISO().split("-").map(Number);
+  const cost=p.check,down=Math.round(cost*p.downPct/100),fin=cost-down,n=Math.max(1,p.months),mk=Math.round(fin*rate/100*n),ratioN=mk/(cost+mk),inst=(fin+mk)/n;
+  for(let i=0;i<H;i++){
+    let inflow=0,profit=0;
+    if(i>0&&p.add)cash+=p.add;
+    rc[i].forEach(([a,r])=>{inflow+=a;profit+=a*r});cash+=inflow;
+    cash-=p.exp;profit-=p.exp;
+    let k=0;while(cash>=fin&&(p.maxDeals<=0||k<p.maxDeals)&&k<200){cash-=fin;profit+=down*ratioN;for(let j=1;j<=n;j++)put(i+j,inst,ratioN);k++}
+    const w=Math.max(0,Math.min(Math.max(0,cash),Math.max(0,profit)*take/100));cash-=w;
+    let port=0;for(let j=i+1;j<RL;j++)rc[j].forEach(([a])=>port+=a);
+    const mm=(now[1]-1+i)%12,yy=now[0]+Math.floor((now[1]-1+i)/12);
+    rows.push({label:MON[mm]+(mm===0||i===0?" "+String(yy).slice(2):""),deals:k,inflow,profit,withdrawn:w,cash,port});
+  }
+  return {rows,sum:rows.reduce((s,r)=>s+r.profit,0),deals:rows.reduce((s,r)=>s+r.deals,0),taken:rows.reduce((s,r)=>s+r.withdrawn,0),inst,mk};
+}
+function fcChart(main,cmp){
+  const narrow=innerWidth<700,W=narrow?360:640,H=narrow?230:250,L=narrow?44:56,R=10,T=14,B=30,n=main.length;const vals=[...main,...cmp];let max=Math.max(1,...vals);
+  const step=[1e3,2e3,5e3,1e4,2e4,25e3,5e4,1e5,2e5,25e4,5e5,1e6].find(s=>max/s<=5)||Math.ceil(max/5);max=Math.ceil(max/step)*step;const min=Math.min(0,...vals);
+  const x=i=>L+(n<=1?0:i*(W-L-R)/(n-1)),y=v=>T+(H-T-B)*(1-(v-min)/(max-min||1));
+  const path=a=>a.map((v,i)=>(i?"L":"M")+x(i).toFixed(1)+" "+y(v).toFixed(1)).join("");
+  const k=v=>v>=1e6?(v/1e6).toFixed(1).replace(".0","")+" млн":v>=1e3||v<=-1e3?Math.round(v/1e3)+" т":String(Math.round(v));
+  let g="";for(let v=0;v<=max;v+=step)g+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1"/><text x="${L-8}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="var(--ink-3)">${k(v)}</text>`;
+  const every=narrow?(n>13?4:n>7?2:1):(n>13?2:1);const lab=main.map((_,i)=>i%every?"":`<text x="${x(i)}" y="${H-8}" text-anchor="middle" font-size="11" fill="var(--ink-3)">${esc(fcState()._labels[i]||"")}</text>`).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="График прогнозируемой прибыли по месяцам" style="display:block;max-width:100%">${g}${lab}
+    <path d="${path(main)}L${x(n-1)} ${y(Math.max(0,min))}L${x(0)} ${y(Math.max(0,min))}Z" fill="var(--primary)" opacity=".12"/>
+    <path d="${path(cmp)}" fill="none" stroke="var(--brass)" stroke-width="2.5" stroke-dasharray="6 5"/>
+    <path d="${path(main)}" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linejoin="round"/>
+    ${main.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v)}" r="3.5" fill="var(--primary)"><title>${esc(fcState()._labels[i]||"")}: ${rub(v)}</title></circle>`).join("")}</svg>`;
+}
+function vForecast(){
+  const p=fcState();const active=S.deals.filter(d=>dealCalc(d).remaining>0).length;
+  const F=(k,l,min,max,st,suf,hint)=>`<div class="fcf"><div class="fcl"><label for="fc_${k}">${l}</label><span class="fcv"><input id="fc_${k}" data-fc="${k}" inputmode="numeric" value="${p[k]}"> ${suf}</span></div><input type="range" data-fc="${k}" min="${min}" max="${max}" step="${st}" value="${p[k]}" aria-label="${l}">${hint?`<div class="hint">${hint}</div>`:""}</div>`;
+  return `<div class="head"><h2>Прогноз дохода</h2><div class="filters">${[6,12,24].map(m=>`<button class="chip" data-a="fc-h" data-v="${m}" aria-pressed="${p.horizon===m}">${m} мес.</button>`).join("")}</div></div>
+  <p class="muted small" style="margin:-6px 0 16px">Старт от реальных данных: касса ${rub(cashLedger().bal)} и ${active} ${plural(active,"действующая рассрочка","действующие рассрочки","действующих рассрочек")} по их точным графикам. Все поступления сразу идут на новые товары.</p>
+  <div class="fcgrid">
+    <section class="panel fc-cond"><h3>Условия</h3>
+      ${F("check","Средний чек (закупка)",10000,300000,5000,"₽")}${F("downPct","Первый взнос",0,50,5,"%")}${F("months","Срок рассрочки",1,24,1,"мес.")}
+      ${F("add","Вклад инвестора в месяц",0,300000,5000,"₽","со следующего месяца")}${F("maxDeals","Не больше сделок в месяц",0,20,1,"шт.","0 — без ограничения")}
+      ${F("take","Забираем из прибыли",0,100,10,"%","0% — вся прибыль остаётся в обороте")}${F("late","Платят с опозданием на месяц",0,50,5,"%")}${F("exp","Расходы в месяц",0,100000,1000,"₽")}
+      <p class="small muted" style="margin:6px 0 0">Ставка наценки ${String(calcSettings().rate).replace(".",",")}% в месяц — из настроек калькулятора.</p>
+    </section>
+    <div id="fcOut"></div><div id="fcTable"></div>
+  </div>`;
+}
+function updateForecast(){
+  const el=$("#fcOut");if(!el)return;const p=fcState();
+  const A=fcRun(p,p.take),C=fcRun(p,100);p._labels=A.rows.map(r=>r.label);
+  const last=A.rows[A.rows.length-1]||{profit:0,cash:0,port:0};
+  const partners=S.partners.filter(x=>x.kind==="partner"&&num(x.share)>0);
+  const addTotal=p.add*Math.max(0,p.horizon-1);
+  el.innerHTML=`<section class="panel"><div class="fctiles">
+      <div><div class="l">Прибыль за ${p.horizon} мес.</div><div class="v">${rub(A.sum)}</div></div>
+      <div><div class="l">В последнем месяце</div><div class="v">${rub(last.profit)}</div></div>
+      <div><div class="l">Новых сделок</div><div class="v">${A.deals}</div></div>
+      <div><div class="l">Касса + к получению в конце</div><div class="v">${rub(last.cash+last.port)}</div></div></div>
+    ${partners.length?`<p class="small" style="margin:12px 0 0">${partners.map(x=>`${esc(x.name)}, доля ${num(x.share)}%: <b>${rub(Math.max(0,A.sum)*num(x.share)/100)}</b>`).join(" · ")}${addTotal?` · вложит ещё ${rub(addTotal)}`:""}</p>`:""}
+    <div style="margin-top:14px">${fcChart(A.rows.map(r=>r.profit),C.rows.map(r=>r.profit))}</div>
+    <div class="fcleg"><span><i style="background:var(--primary)"></i>Прибыль в месяц${p.take?" (забираем "+p.take+"%)":" (всё в обороте)"}</span><span><i class="dash"></i>Если забирать всю прибыль: ${rub(C.sum)} за ${p.horizon} мес.</span></div>
+    <p class="small muted" style="margin:10px 0 0">Сделка в модели: закупка ${rub(p.check)}, взнос ${rub(Math.round(p.check*p.downPct/100))}, наценка ${rub(A.mk)}, ${p.months} ${plural(p.months,"платёж","платежа","платежей")} по ${rub(A.inst)}.</p></section>
+  `;$("#fcTable").innerHTML=`<section class="panel"><h3>По месяцам</h3><div class="tw keep"><table><thead><tr><th>Месяц</th><th class="n">Сделок</th><th class="n hide-m">Поступит</th><th class="n">Прибыль</th><th class="n">Касса</th></tr></thead><tbody>
+    ${A.rows.map(r=>`<tr><td>${esc(r.label)}</td><td class="n">${r.deals||"—"}</td><td class="n hide-m">${rub(r.inflow)}</td><td class="n">${rub(r.profit)}</td><td class="n">${rub(r.cash)}</td></tr>`).join("")}</tbody></table></div>
+    <p class="small muted" style="margin:10px 0 0">Это прогноз, а не обещание: спрос, просрочки и цены в жизни меняются. Прибыль — наценка в полученных деньгах минус расходы, так же, как в отчётах.</p></section>`;
+}
 
 /* ---------- applications (заявки) ---------- */
 let APPS=[],appsSub=false,appsLoaded=false;
@@ -1962,6 +2058,7 @@ document.addEventListener("click",async e=>{
   switch(a){
     case "close":closeModal();break;
     case "sheet":openSheet(t.dataset.v);break;
+    case "fc-h":fcState().horizon=+t.dataset.v;fcSave();draw();break;
     case "mk-auto":dealCalcPreview("auto");break;
     case "paid":mPaid(id);break;
     case "portal":mPortal(id);break;
@@ -2077,6 +2174,9 @@ document.addEventListener("change",async e=>{const t=e.target;
   if(t.dataset.appstatus){const ap=APPS.find(x=>x.id===t.dataset.appstatus);if(await appUpdate(t.dataset.appstatus,{status:t.value},"Статус: "+APP_ST[t.value][0].toLowerCase()))logIt("Изменил","applications",`Заявка ${ap?ap.name:""}: ${APP_ST[t.value][0]}`)}
   if(t.dataset.appnote){appUpdate(t.dataset.appnote,{note:t.value.trim().slice(0,1000)},"Заметка сохранена")}
 });
+document.addEventListener("input",e=>{const k=e.target.dataset&&e.target.dataset.fc;if(!k)return;const p=fcState();
+  let v=Math.round(num(String(e.target.value).replace(/[^\d]/g,"")));const lim={downPct:90,months:60,take:100,late:90,maxDeals:200};if(lim[k]!==undefined)v=Math.min(lim[k],v);if(k==="months")v=Math.max(1,v);
+  p[k]=v;fcSave();document.querySelectorAll(`[data-fc="${k}"]`).forEach(x=>{if(x!==e.target){if(x.type==="range"&&v>+x.max)x.max=v;x.value=v}});updateForecast()});
 document.addEventListener("input",e=>{const k=e.target.dataset&&e.target.dataset.calc;if(!k)return;const s=calcState();
   let v=Math.round(num(String(e.target.value).replace(/\D/g,"")));if(k==="months")v=Math.min(120,Math.max(1,v||1));
   s[k]=v;if(k==="price"&&s.down>s.price)s.down=s.price;
