@@ -73,9 +73,8 @@ h2{font:700 20px/1.2 var(--D);margin:0 0 4px}
 .btn.pri:disabled{opacity:.6;cursor:wait}
 .btn.wa{background:#1F8F55;border-color:#1F8F55;color:#fff;width:100%;padding:14px}
 .btn:focus-visible,.f input:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
-.gbox{border:1px dashed var(--line);border-radius:14px;padding:12px 14px;margin-bottom:14px}
-.gbox summary{cursor:pointer;font-weight:600;color:var(--teal);font-size:15px}
-.gbox summary i{font-style:normal;font-weight:400;color:var(--ink2)}
+.gbox{border:1px solid var(--line);background:#FAFBFA;border-radius:14px;padding:12px 14px;margin-bottom:14px}
+.gbox .gt{font-weight:600;font-size:15px}
 .gbox .hint{font-size:13px;color:var(--ink2)}
 .consent{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--ink2);margin:4px 0 16px;cursor:pointer}
 .consent input{width:22px;height:22px;margin:0;flex:0 0 auto;accent-color:var(--teal)}
@@ -121,22 +120,22 @@ footer{text-align:center;color:var(--ink2);font-size:12.5px;padding:8px 16px 28p
     <div class="f" id="f_phone"><label for="phone">Телефон</label><input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+7 928 000-00-00" maxlength="30"><div class="err">Укажите телефон полностью, например +7 928 000-00-00</div></div>
     <div class="f" id="f_product"><label for="product">Что хотите купить</label><input id="product" maxlength="300" placeholder="Например, iPhone 16 Pro 256 ГБ"><div class="hint">Можно вставить ссылку на товар из магазина</div><div class="err">Напишите, какой товар нужен</div></div>
     <div class="f"><label for="city">Город <i>— необязательно</i></label><input id="city" autocomplete="address-level2" maxlength="80" value="Махачкала"></div>
-    <details class="gbox" id="gbox"><summary>Есть поручитель? <i>— необязательно</i></summary>
-      <p class="hint" style="margin:8px 0 12px">Поручитель — родственник или знакомый, который готов поручиться за вас. С ним заявку одобряют быстрее. Указывайте его, только если он согласен.</p>
+    <div class="gbox" id="gbox"><div class="gt">Поручитель</div>
+      <p class="hint" style="margin:4px 0 12px">Родственник или знакомый, который готов поручиться за вас. Указывайте его только с его согласия.</p>
       <div class="f" id="f_gname"><label for="g_name">ФИО поручителя</label><input id="g_name" maxlength="80" autocomplete="off"><div class="err">Укажите ФИО поручителя</div></div>
-      <div class="f" id="f_gphone"><label for="g_phone">Телефон поручителя</label><input id="g_phone" type="tel" inputmode="tel" maxlength="30" autocomplete="off" placeholder="+7 928 000-00-00"><div class="err">Укажите телефон поручителя полностью</div></div>
-      <div class="f"><label for="g_relation">Кем приходится вам</label><input id="g_relation" maxlength="40" list="rel" autocomplete="off" placeholder="брат, отец, друг…"><datalist id="rel"><option>Брат</option><option>Сестра</option><option>Отец</option><option>Мать</option><option>Супруг(а)</option><option>Сын</option><option>Дочь</option><option>Дядя</option><option>Родственник</option><option>Друг</option><option>Коллега</option></datalist></div>
-    </details>
+      <div class="f" id="f_gphone"><label for="g_phone">Телефон поручителя</label><input id="g_phone" type="tel" inputmode="tel" maxlength="30" autocomplete="off" placeholder="+7 928 000-00-00"><div class="err">Укажите телефон поручителя полностью. Он должен отличаться от вашего</div></div>
+      <div class="f" id="f_grel" style="margin-bottom:0"><label for="g_relation">Кем приходится вам</label><input id="g_relation" maxlength="40" list="rel" autocomplete="off" placeholder="брат, отец, друг…"><datalist id="rel"><option>Брат</option><option>Сестра</option><option>Отец</option><option>Мать</option><option>Супруг(а)</option><option>Сын</option><option>Дочь</option><option>Дядя</option><option>Родственник</option><option>Друг</option><option>Коллега</option></datalist><div class="err">Укажите, кем вам приходится поручитель</div></div>
+    </div>
     <div class="f"><label for="comment">Комментарий <i>— необязательно</i></label><textarea id="comment" maxlength="1000" placeholder="Цвет, память, удобное время для звонка"></textarea></div>
     <div class="f"><label>Фото или скриншот товара <i>— необязательно</i></label>
       <div class="photo"><label class="btn" for="photo">Прикрепить фото</label><input id="photo" type="file" accept="image/*" hidden><img id="ph" alt="Прикреплённое фото" hidden><button type="button" class="x" id="phx" hidden>Убрать</button></div></div>
     <div class="hp" aria-hidden="true"><label>Сайт<input id="website" tabindex="-1" autocomplete="off"></label></div>
-    <label class="consent" id="consentL"><input type="checkbox" id="consent"><span>Согласен на обработку имени, телефона и города для связи по заявке, а также данных поручителя — с его согласия. <a href="#policy">Подробнее</a></span></label>
+    <label class="consent" id="consentL"><input type="checkbox" id="consent"><span>Согласен на обработку имени, телефона и города для связи по заявке, а также данных поручителя, который согласен их передать. <a href="#policy">Подробнее</a></span></label>
     <p class="formerr" id="formerr" role="alert"></p>
     <button class="btn pri" type="submit" id="send">Отправить заявку</button>
   </form>
   <details id="policy"><summary>Как мы используем ваши данные</summary>
-    <p>Мы получаем только то, что вы указали в заявке: имя, телефон, город, описание товара, фото товара и данные поручителя, если вы их указали. Эти данные нужны, чтобы связаться с вами и подготовить предложение. Мы не передаём их третьим лицам и не используем для рассылок.</p>
+    <p>Мы получаем только то, что вы указали в заявке: имя, телефон, город, описание товара, фото товара и данные поручителя (имя, телефон, кем приходится). Эти данные нужны, чтобы связаться с вами и подготовить предложение. Мы не передаём их третьим лицам и не используем для рассылок.</p>
     <p>Заявка хранится не дольше года. Чтобы удалить её раньше, напишите или позвоните нам<span id="polPhone"></span>.</p>
     <p id="polSeller"></p>
   </details>
@@ -213,7 +212,7 @@ $("#phx").addEventListener("click",()=>{photo="";$("#ph").hidden=true;$("#phx").
 function showErr(t){const x=$("#formerr");x.textContent=t;x.classList.toggle("on",!!t)}
 const digits=p=>{let d=String(p||"").replace(/\D/g,"");if(d.length===11&&d[0]==="8")d="7"+d.slice(1);if(d.length===10)d="7"+d;return d};
 ["name","phone","product"].forEach(id=>$("#"+id).addEventListener("input",()=>$("#f_"+id).classList.remove("bad")));
-["g_name","g_phone"].forEach(id=>$("#"+id).addEventListener("input",()=>$("#f_"+id.replace("_",""))&&$("#f_"+id.replace("_","")).classList.remove("bad")));
+[["g_name","gname"],["g_phone","gphone"],["g_relation","grel"]].forEach(([id,f])=>$("#"+id).addEventListener("input",()=>$("#f_"+f).classList.remove("bad")));
 $("#consent").addEventListener("change",()=>$("#consentL").classList.remove("bad"));
 $("#form").addEventListener("submit",async e=>{
   e.preventDefault();showErr("");
@@ -223,8 +222,8 @@ $("#form").addEventListener("submit",async e=>{
   const bad=(id,cond)=>{$("#f_"+id).classList.toggle("bad",cond);if(cond){ok=false;first=first||$("#"+id)}};
   bad("name",name.length<2);bad("phone",digits(phone).length<10||digits(phone).length>15);bad("product",product.length<2);
   const gname=$("#g_name").value.trim(),gphone=$("#g_phone").value.trim(),grel=$("#g_relation").value.trim();
-  const gbad=(id,cond)=>{const el=$("#f_"+id);el.classList.toggle("bad",cond);if(cond){ok=false;$("#gbox").open=true;first=first||el.querySelector("input")}};
-  gbad("gname",!gname&&!!(gphone||grel));gbad("gphone",!!gphone&&(digits(gphone).length<10||digits(gphone).length>15));
+  const gbad=(id,cond)=>{const el=$("#f_"+id);el.classList.toggle("bad",cond);if(cond){ok=false;first=first||el.querySelector("input")}};
+  gbad("gname",gname.length<2);gbad("gphone",digits(gphone).length<10||digits(gphone).length>15||digits(gphone)===digits(phone));gbad("grel",grel.length<2);
   if(!$("#consent").checked){$("#consentL").classList.add("bad");if(ok){showErr("Отметьте согласие на обработку данных — без него мы не сможем с вами связаться.")}ok=false}
   if(!ok){if(first)first.focus();return}
   if(!SB){showErr("Нет связи с сервером. Проверьте интернет и попробуйте ещё раз.");return}
