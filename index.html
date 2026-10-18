@@ -1292,7 +1292,7 @@ function openSheet(kind){
   const vis=visTabs();const sh=$("#sheet"),inn=$("#sheetIn");
   if(kind==="plus"){
     const acts=[["new-pay","pay","Принять платёж"],["new-deal","newdeal","Новая сделка"],["tab:calc","calc","Калькулятор для клиента"],["new-client","clients","Новый клиент"],["new-product","products","Купить товар на склад"],["new-expense","expense","Записать расход"],["new-draw","cash","Взять из кассы"]];
-    inn.innerHTML=`<h4>Добавить</h4>`+acts.filter(([a])=>a!=="tab:calc"||vis.some(t=>t[0]==="calc")).map(([a,ic,l])=>`<button class="sbtn" role="menuitem" ${a.startsWith("tab:")?`data-tab="${a.slice(4)}"`:`data-a="${a}"`}><span class="ic">${svgI(ic)}</span>${l}</button>`).join("");
+    inn.innerHTML=`<h4>Добавить</h4>`+acts.filter(([a])=>(a!=="tab:calc"||vis.some(t=>t[0]==="calc"))&&(a!=="new-draw"||isFull())).map(([a,ic,l])=>`<button class="sbtn" role="menuitem" ${a.startsWith("tab:")?`data-tab="${a.slice(4)}"`:`data-a="${a}"`}><span class="ic">${svgI(ic)}</span>${l}</button>`).join("");
   }else{
     const mobile=matchMedia("(max-width:640px)").matches;
     const list=vis.filter(([k])=>mobile?!BOTTOM.includes(k):!PRIMARY.includes(k));
