@@ -386,7 +386,7 @@ window.AMANAT_CONFIG={
 (function(){
 "use strict";
 const LOGO_BIG='<span class="lockup big"><svg class="lmark" viewBox="0 0 200 200" width="46" height="46" aria-hidden="true"><rect width="200" height="200" rx="46" fill="#0A403B"/><path d="M54 156V96C54 66 78 47 100 34C122 47 146 66 146 96V156" fill="none" stroke="#D9AE55" stroke-width="12" stroke-linejoin="round"/><path d="M40 156H160" stroke="#D9AE55" stroke-width="12" stroke-linecap="round"/><circle cx="100" cy="98" r="15" fill="#D9AE55"/><path d="M92 106L86 136H114L108 106Z" fill="#D9AE55"/></svg><svg class="lword" viewBox="-6 0 392 80" height="26" style="width:auto;overflow:hidden" role="img" aria-label="AMANA"><g fill="none" stroke="currentColor" stroke-width="11" stroke-miterlimit="10"><path d="M-2 86L30-4L62 86M13 54H47M80 86V0L110 54L140 0V86M158 86L190-4L222 86M173 54H207M240 86V0L300 80M300 86V-6M318 86L350-4L382 86M333 54H367"/></g></svg></span>';
-const COLS=["clients","products","deals","payments","loans","partners","expenses","cash","photos","payouts","company"];
+const COLS=["clients","products","deals","payments","loans","partners","expenses","cash","photos","payouts","company","draws"];
 const comp=()=>S.company.find(x=>x.id==="main")||{};
 const S={}; COLS.forEach(c=>S[c]=[]);
 let db=null, userCap=null, downloads=null, ME={id:null,isOwner:false,name:"",avatarUrl:""}, SETTINGS={roles:{},requirePin:false}, MEMBERS=[], LOG=[], NAMES={}, PIN=null, gateReady=false, unlocked=false, pinFails=0, pinBlockUntil=0, canWrite=true, loaded=new Set(), offline=false;
@@ -462,6 +462,8 @@ function cashLedger(){
   S.payments.forEach(p=>{const d=byId("deals",p.dealId);const c=d&&byId("clients",d.clientId);ops.push({date:p.date,in:num(p.amount),what:"Платёж — "+(c?c.name:"")+(d?" ("+d.code+")":""),ref:p.code,kind:"pay"})});
   S.expenses.forEach(e=>ops.push({date:e.date,out:num(e.amount),what:"Расход: "+(e.category||"")+(e.desc?" — "+e.desc:""),ref:e.code,kind:"exp"}));
   S.payouts.forEach(p=>ops.push({date:p.date,out:num(p.amount),what:"Выплата прибыли — "+partnerName(p.partnerId)+(p.label?" ("+p.label+")":""),ref:"",kind:"payout"}));
+  (S.draws||[]).forEach(w=>{const who=drawWho(w);ops.push({date:w.date,out:num(w.amount),what:(w.kind==="advance"?"Аванс в счёт доли — ":"Взял из кассы — ")+who+(w.purpose?" ("+w.purpose+")":""),ref:w.code,kind:"draw"});
+    (w.returns||[]).forEach(r=>ops.push({date:r.date,in:num(r.amount),what:"Вернул в кассу — "+who,ref:w.code,kind:"draw"}))});
   S.cash.forEach(c=>ops.push({date:c.date,in:c.dir==="in"?num(c.amount):0,out:c.dir==="out"?num(c.amount):0,what:c.desc||"Прочая операция",ref:"",kind:"manual",id:c.id}));
   ops.sort((a,b)=>(a.date||"").localeCompare(b.date||""));
   let bal=0; ops.forEach(o=>{bal+=(o.in||0)-(o.out||0);o.bal=bal});
@@ -484,7 +486,7 @@ function D(html){return canDel()?html:""}
 function who(uid){if(!uid)return "—";const r=SETTINGS.roles&&SETTINGS.roles[uid];return (r&&r.label)||NAMES[uid]||(uid===ME.id?(ME.name||"Вы"):"Пользователь")}
 let namesT=null;
 function refreshNames(){clearTimeout(namesT);namesT=setTimeout(async()=>{if(!userCap)return;const ids=new Set([...MEMBERS.map(m=>m.id),...Object.keys(SETTINGS.roles||{}),...LOG.map(l=>l.uid).filter(Boolean)]);if(!ids.size)return;try{const ps=await userCap.profiles([...ids]);let ch=false;for(const [id,p] of Object.entries(ps)){if(p&&p.name&&NAMES[id]!==p.name){NAMES[id]=p.name;ch=true}}if(ch)render()}catch(e){}},300)}
-const COLNAMES={clients:"Клиент",products:"Товар",deals:"Сделка",payments:"Платёж",loans:"Займ",partners:"Партнёр",expenses:"Расход",cash:"Касса",photos:"Фото",payouts:"Выплата",company:"Настройки"};
+const COLNAMES={clients:"Клиент",products:"Товар",deals:"Сделка",payments:"Платёж",loans:"Займ",partners:"Партнёр",expenses:"Расход",cash:"Касса",photos:"Фото",payouts:"Выплата",company:"Настройки",draws:"Взято из кассы"};
 function describe(col,d){
   if(!d)return COLNAMES[col]||col;
   const cl=id=>{const c=byId("clients",id);return c?c.name:""};
@@ -501,6 +503,7 @@ function describe(col,d){
     case "payouts":return `Выплата прибыли — ${partnerName(d.partnerId)}, ${rub(num(d.amount))}${d.label?" за "+d.label:""}`;
     case "company":return "Реквизиты и настройки AMANA";
     case "applications":return "Заявка";
+    case "draws":return `${d.code||""} · ${d.kind==="advance"?"аванс":"займ из кассы"} ${rub(num(d.amount))} — ${drawWho(d)}`;
   }
   return COLNAMES[col]||col;
 }
@@ -612,6 +615,7 @@ function vHome(deals){
         <h3>Капитал и склад</h3>
         <dl class="kv">
           <dt>Остаток займов перед партнёрами</dt><dd>${rub(loansLeft)}</dd>
+          ${drawsSum("loan")?`<dt>Должны вернуть в кассу</dt><dd>${rub(drawsSum("loan"))}</dd>`:""}${drawsSum("advance")?`<dt>Авансы к зачёту</dt><dd>${rub(drawsSum("advance"))}</dd>`:""}
           <dt>Товар на складе</dt><dd>${stock.length} шт · ${rub(stockVal)}</dd>
           <dt>Сделок всего</dt><dd>${deals.length}</dd>
           <dt>Клиентов</dt><dd>${S.clients.length}</dd>
@@ -633,6 +637,9 @@ function vDeals(deals){
   const q=ui.q.trim().toLowerCase();
   const f=ui.dealFilter;
   const list=deals.filter(({d,c})=>(f==="all"||c.status===f)&&(!q||[d.code,c.client&&c.client.name,c.client&&c.client.phone,c.product&&c.product.name,c.product&&c.product.model,d.manager,d.guarantor&&d.guarantor.name,d.guarantor&&d.guarantor.phone].join(" ").toLowerCase().includes(q)));
+  const rank=c=>c.remaining<=0?3:c.status==="overdue"?0:1;
+  list.sort((x,y)=>{const a=rank(x.c),b=rank(y.c);if(a!==b)return a-b;if(a===3)return (y.d.date||"").localeCompare(x.d.date||"");
+    return ((x.c.next&&x.c.next.due)||"9999").localeCompare((y.c.next&&y.c.next.due)||"9999")||(x.d.code||"").localeCompare(y.d.code||"")});
   const chips=[["all","Все"],["active","В процессе"],["overdue","Просрочка"],["closed","Закрытые"]];
   return `<div class="head"><h2>Сделки</h2><div class="filters">${chips.map(([k,l])=>`<button class="chip" data-a="filter" data-v="${k}" aria-pressed="${f===k}">${l}</button>`).join("")}<input id="q" class="search" placeholder="Поиск: клиент, товар, номер" value="${esc(ui.q)}">${W(`<button class="btn pri" data-a="new-deal">Новая сделка</button>`)}</div></div>
   ${list.length?`<div class="tw"><table><thead><tr><th>№</th><th>Клиент</th><th class="hide-m">Товар</th><th>График</th><th class="n">Цена</th><th class="n">Остаток</th><th>След. платёж</th><th>Статус</th></tr></thead><tbody>
@@ -693,7 +700,7 @@ function vCapital(){
       const back=(l.returns||[]).reduce((a,r)=>a+num(r.amount),0), left=num(l.amount)-back; const late=left>0&&l.due&&l.due<todayISO();
       return `<div class="item click" data-a="loan" data-id="${l.id}"><div><div class="t">${esc(l.code)} · ${esc(partnerName(l.partnerId))} <span class="tag ${l.kind==="capital"?"mid":"gray"}">${l.kind==="capital"?"капитал":"займ"}</span></div><div class="s">${fmtD(l.date)}${l.due?" · вернуть до "+fmtD(l.due):""}${l.purpose?" · "+esc(l.purpose):""}</div></div><div class="r"><div class="amt">${rub(left)}</div><div>${left<=0?`<span class="tag ok">Возвращён</span>`:late?`<span class="tag bad">Срок прошёл</span>`:`<span class="tag act">из ${rub(num(l.amount))}</span>`}</div></div></div>`}).join(""):`<div class="empty">Займов пока нет</div>`}</div></div>
     <p class="small muted">Займ возвращается ровно в той сумме, в какой был взят — без процентов. Доля в прибыли учитывается отдельно, не через займ.</p>
-  </section></div>`;
+  </section></div>${drawsHTML()}`;
 }
 
 function vExpenses(){
@@ -1284,7 +1291,7 @@ function navHTML(od){
 function openSheet(kind){
   const vis=visTabs();const sh=$("#sheet"),inn=$("#sheetIn");
   if(kind==="plus"){
-    const acts=[["new-pay","pay","Принять платёж"],["new-deal","newdeal","Новая сделка"],["tab:calc","calc","Калькулятор для клиента"],["new-client","clients","Новый клиент"],["new-product","products","Купить товар на склад"],["new-expense","expense","Записать расход"]];
+    const acts=[["new-pay","pay","Принять платёж"],["new-deal","newdeal","Новая сделка"],["tab:calc","calc","Калькулятор для клиента"],["new-client","clients","Новый клиент"],["new-product","products","Купить товар на склад"],["new-expense","expense","Записать расход"],["new-draw","cash","Взять из кассы"]];
     inn.innerHTML=`<h4>Добавить</h4>`+acts.filter(([a])=>a!=="tab:calc"||vis.some(t=>t[0]==="calc")).map(([a,ic,l])=>`<button class="sbtn" role="menuitem" ${a.startsWith("tab:")?`data-tab="${a.slice(4)}"`:`data-a="${a}"`}><span class="ic">${svgI(ic)}</span>${l}</button>`).join("");
   }else{
     const mobile=matchMedia("(max-width:640px)").matches;
@@ -1820,6 +1827,51 @@ async function saveEarly(id){
   closeModal();toast("Рассрочка закрыта досрочно"+(disc>0?", скидка "+rub(disc):""));
 }
 
+
+/* ---------- взято из кассы: займы и авансы партнёрам ---------- */
+function drawWho(w){return w.partnerId?partnerName(w.partnerId):(w.name||"—")}
+function drawLeft(w){return num(w.amount)-(w.returns||[]).reduce((a,r)=>a+num(r.amount),0)-(w.offsets||[]).reduce((a,r)=>a+num(r.amount),0)}
+function drawsOpen(kind,pid){return (S.draws||[]).filter(w=>(!kind||w.kind===kind)&&(!pid||w.partnerId===pid)&&drawLeft(w)>0)}
+function drawsSum(kind,pid){return drawsOpen(kind,pid).reduce((s,w)=>s+drawLeft(w),0)}
+function drawsHTML(){
+  const list=[...(S.draws||[])].sort((a,b)=>(drawLeft(b)>0)-(drawLeft(a)>0)||(b.date||"").localeCompare(a.date||""));
+  const loanSum=drawsSum("loan"),advSum=drawsSum("advance");
+  return `<section style="margin-top:22px"><div class="head"><h2>Взято из кассы</h2>${W(`<button class="btn pri" data-a="new-draw">Записать</button>`)}</div>
+    ${loanSum||advSum?`<div class="fctiles" style="grid-template-columns:1fr 1fr;margin-bottom:12px"><div><div class="l">Должны вернуть в кассу</div><div class="v">${rub(loanSum)}</div></div><div><div class="l">Авансы к зачёту из прибыли</div><div class="v">${rub(advSum)}</div></div></div>`:""}
+    <div class="panel"><div class="list">${list.length?list.map(w=>{const left=drawLeft(w),late=w.kind==="loan"&&left>0&&w.due&&w.due<todayISO();
+      return `<div class="item click" data-a="draw" data-id="${w.id}"><div><div class="t">${esc(w.code)} · ${esc(drawWho(w))} <span class="tag ${w.kind==="advance"?"mid":"gray"}">${w.kind==="advance"?"аванс":"займ"}</span></div><div class="s">${fmtD(w.date)}${w.kind==="loan"&&w.due?" · вернуть до "+fmtD(w.due):""}${w.purpose?" · "+esc(w.purpose):""}</div></div>
+        <div class="r"><div class="amt">${rub(left)}</div><div>${left<=0?`<span class="tag ok">${w.kind==="advance"?"Зачтён":"Возвращён"}</span>`:late?`<span class="tag bad">Срок прошёл</span>`:`<span class="tag act">из ${rub(num(w.amount))}</span>`}</div></div></div>`}).join(""):`<div class="empty">Никто ничего не брал</div>`}</div></div>
+    <p class="small muted">Займ возвращается в кассу той же суммой, без процентов. Аванс — это часть будущей доли прибыли: при выплате он вычитается сам. Деньги в обороте — капитал инвестора, поэтому займ из кассы — только с его согласия.</p></section>`;
+}
+function mDraw(id){
+  const w=id?byId("draws",id):{code:nextCode("draws","W",3),date:todayISO(),kind:"advance"};
+  const parts=S.partners.map(p=>[p.id,p.name]);
+  const left=id?drawLeft(w):0;
+  const hist=id?[...(w.returns||[]).map(r=>`<li>${fmtD(r.date)} — вернул ${rub(num(r.amount))}</li>`),...(w.offsets||[]).map(r=>`<li>${fmtD(r.date)} — зачтено из прибыли ${rub(num(r.amount))}${r.label?" ("+esc(r.label)+")":""}</li>`)].join(""):"";
+  openModal(id?`${esc(w.code)} · ${esc(drawWho(w))}`:"Взять из кассы",`<div class="form">
+    ${field("partnerId","Кто взял",{type:"select",req:1,value:w.partnerId||(w.name?"__other":""),options:[...parts,["__other","Другой человек…"]]})}${field("name","Имя (если не партнёр)",{value:w.name||""})}
+    ${field("kind","Вид",{type:"select",blank:false,value:w.kind,options:[["advance","Аванс в счёт доли прибыли"],["loan","Займ — вернуть в кассу"]],full:1})}
+    ${field("amount","Сумма, ₽",{type:"number",value:w.amount,req:1})}${field("date","Дата",{type:"date",value:w.date,req:1})}
+    ${field("due","Вернуть до (для займа)",{type:"date",value:w.due||""})}${field("code","Номер",{value:w.code,req:1})}
+    ${field("purpose","На что",{value:w.purpose||"",ph:"личные нужды",full:1})}
+    ${id&&left>0&&w.kind==="loan"?`<div class="calc">Осталось вернуть: <b>${rub(left)}</b></div>${field("retAmount","Вернул сейчас, ₽",{type:"number"})}${field("retDate","Дата возврата",{type:"date",value:todayISO()})}`:""}
+    ${id&&left>0&&w.kind==="advance"?`<div class="calc">Осталось зачесть из прибыли: <b>${rub(left)}</b>. Зачтётся само при выплате доли в «Отчётах».</div>`:""}
+    ${hist?`<div class="full"><div class="small muted">История</div><ul class="small" style="margin:6px 0 0;padding-left:18px">${hist}</ul></div>`:""}
+    <div class="note">${id?"":"Сумма сразу спишется из кассы. "}Займ возвращается той же суммой, без процентов. Аванс — часть будущей доли прибыли.</div>
+  </div>`,`${id?D(`<button class="btn dng" data-a="del-draw" data-id="${w.id}" style="margin-right:auto">Удалить</button>`):""}<button class="btn" data-a="close">Отмена</button>${W(`<button class="btn pri" data-a="save-draw" data-id="${id||""}">Сохранить</button>`)}`);
+}
+async function saveDraw(id){
+  const o=formData();if(!need(o,[["partnerId","Кто взял"],["amount","Сумма"],["date","Дата"],["code","Номер"]]))return;
+  if(o.partnerId==="__other"&&o.name.trim().length<2)return showErr("Укажите имя");
+  if(num(o.amount)<=0)return showErr("Сумма должна быть больше нуля");
+  if((S.draws||[]).some(w=>w.code===o.code&&w.id!==id))return showErr("Такой номер уже есть");
+  const old=id?byId("draws",id):null;
+  if(!old){const bal=cashLedger().bal;if(num(o.amount)>bal)return showErr("В кассе только "+rub(bal))}
+  const w={...(old?strip(old):{}),code:o.code,date:o.date,kind:o.kind,amount:num(o.amount),purpose:o.purpose,due:o.kind==="loan"?o.due:"",partnerId:o.partnerId==="__other"?"":o.partnerId,name:o.partnerId==="__other"?o.name.trim():""};
+  if(old&&num(o.retAmount)>0){const left=drawLeft(old);if(num(o.retAmount)>left)return showErr("Возврат больше остатка ("+rub(left)+")");w.returns=[...(old.returns||[]),{date:o.retDate||todayISO(),amount:num(o.retAmount)}]}
+  if(await save("draws",id||null,w)){closeModal();toast(old&&num(o.retAmount)>0?"Возврат записан":old?"Сохранено":o.kind==="advance"?"Аванс записан":"Займ записан")}
+}
+
 /* ---------- profit distribution ---------- */
 function distributionHTML(R){
   const partners=S.partners.filter(p=>p.kind==="partner"&&num(p.share)>0);
@@ -1831,8 +1883,8 @@ function distributionHTML(R){
     const capTotal=partners.reduce((s,p)=>s+S.loans.filter(l=>l.partnerId===p.id&&l.kind==="capital").reduce((a,l)=>a+num(l.amount),0),0);
     rows=partners.map(p=>{const amt=base>0?Math.round(base*num(p.share)/100):0;const cap=S.loans.filter(l=>l.partnerId===p.id&&l.kind==="capital").reduce((a,l)=>a+num(l.amount),0);
       const loss=base<0&&capTotal?Math.round(base*cap/capTotal):0;
-      const paid=S.payouts.filter(x=>x.partnerId===p.id&&x.from===R.a&&x.to===R.b).reduce((s,x)=>s+num(x.amount),0);
-      return `<tr><td>${esc(p.name)}</td><td class="n">${num(p.share)}%</td><td class="n">${base>0?rub(amt):loss?`<span style="color:var(--danger)">${rub(loss)}</span>`:"—"}</td><td class="n">${paid?rub(paid):"—"}</td><td>${base>0&&paid<amt?W(`<button class="btn sm" data-a="payout" data-p="${p.id}" data-v="${amt-paid}">Выплатить</button>`):paid>=amt&&amt>0?`<span class="tag ok">выплачено</span>`:""}</td></tr>`}).join("");
+      const paid=S.payouts.filter(x=>x.partnerId===p.id&&x.from===R.a&&x.to===R.b).reduce((s,x)=>s+num(x.amount)+num(x.offset),0);const adv=drawsSum("advance",p.id);
+      return `<tr><td>${esc(p.name)}</td><td class="n">${num(p.share)}%</td><td class="n">${base>0?rub(amt):loss?`<span style="color:var(--danger)">${rub(loss)}</span>`:"—"}</td><td class="n">${paid?rub(paid):"—"}${adv&&base>0&&paid<amt?`<div class="small muted">аванс к зачёту ${rub(adv)}</div>`:""}</td><td>${base>0&&paid<amt?W(`<button class="btn sm" data-a="payout" data-p="${p.id}" data-v="${amt-paid}">Выплатить</button>`):paid>=amt&&amt>0?`<span class="tag ok">выплачено</span>`:""}</td></tr>`}).join("");
   }
   const rest=partners.length&&base>0?base-partners.reduce((s,p)=>s+Math.round(base*num(p.share)/100),0):0;
   return `<section class="panel" style="margin-top:22px"><h3>Распределение прибыли за ${esc(label)}</h3>
@@ -1843,10 +1895,14 @@ function distributionHTML(R){
   </section>`;
 }
 function mPayout(pid,amt){
-  openModal("Выплата прибыли · "+esc(partnerName(pid)),`<div class="form">${field("amount","Сумма, ₽",{type:"number",value:amt,req:1})}${field("date","Дата",{type:"date",value:todayISO(),req:1})}
+  amt=num(amt);const adv=drawsSum("advance",pid),off=Math.min(adv,amt);
+  openModal("Выплата прибыли · "+esc(partnerName(pid)),`<div class="form">${adv?`<div class="calc">Причитается ${rub(amt)}. Аванс к зачёту: ${rub(adv)} — вычитаем ${rub(off)}, выдать на руки ${rub(amt-off)}.</div><input type="hidden" name="offset" value="${off}">`:""}${field("amount","Выдать на руки, ₽",{type:"number",value:amt-off,req:1})}${field("date","Дата",{type:"date",value:todayISO(),req:1})}
     <div class="note">Выплата за период: ${esc(periodTitle(ui.from,ui.to))}. Деньги спишутся из кассы.</div><input type="hidden" name="partnerId" value="${pid}"></div>`,`<button class="btn" data-a="close">Отмена</button><button class="btn pri" data-a="save-payout">Записать выплату</button>`)}
-async function savePayout(){const o=formData();if(!need(o,[["amount","Сумма"],["date","Дата"]]))return;if(num(o.amount)<=0)return showErr("Сумма должна быть больше нуля");
-  if(await save("payouts",null,{partnerId:o.partnerId,amount:num(o.amount),date:o.date,from:ui.from,to:ui.to,label:periodTitle(ui.from,ui.to)})){closeModal();toast("Выплата записана")}}
+async function savePayout(){const o=formData();if(!need(o,[["date","Дата"]]))return;const off=num(o.offset);if(num(o.amount)<0||num(o.amount)+off<=0)return showErr("Сумма должна быть больше нуля");
+  const label=periodTitle(ui.from,ui.to);
+  if(await save("payouts",null,{partnerId:o.partnerId,amount:num(o.amount),offset:off,date:o.date,from:ui.from,to:ui.to,label})){
+    let rest=off;for(const w of drawsOpen("advance",o.partnerId).sort((a,b)=>(a.date||"").localeCompare(b.date||""))){if(rest<=0)break;const take=Math.min(rest,drawLeft(w));rest-=take;await save("draws",w.id,{...strip(w),offsets:[...(w.offsets||[]),{date:o.date,amount:take,label}]})}
+    closeModal();toast(off?"Выплата записана, аванс зачтён":"Выплата записана")}}
 
 /* ---------- zakat ---------- */
 function readZakatInputs(){const g=id=>{const e=document.getElementById(id);return e?(e.type==="checkbox"?e.checked:e.value):undefined};
@@ -1860,9 +1916,10 @@ function zakatCalc(z){
   let good=0,doubt=0;
   allDeals().filter(x=>x.d.date<=date).forEach(({c})=>{if(c.remaining<=0)return;if(c.daysLate>90)doubt+=c.remaining;else good+=c.remaining});
   const qard=S.loans.filter(l=>l.kind!=="capital"&&l.date<=date).reduce((s,l)=>s+num(l.amount)-(l.returns||[]).filter(r=>r.date<=date).reduce((a,r)=>a+num(r.amount),0),0);
-  const base=cash+stock+good+(z.od?doubt:0)-qard;
+  const lent=(S.draws||[]).filter(w=>w.kind==="loan"&&w.date<=date).reduce((s,w)=>s+num(w.amount)-(w.returns||[]).filter(r=>r.date<=date).reduce((a,r)=>a+num(r.amount),0),0);
+  const base=cash+stock+good+lent+(z.od?doubt:0)-qard;
   const nisab=z.gold*85;
-  return {cash,stock,stockCost,stockN:stockList.length,good,doubt,qard,base,nisab,due:z.gold>0&&base>=nisab?Math.round(base*0.025):0};
+  return {cash,stock,stockCost,stockN:stockList.length,good,doubt,qard,lent,base,nisab,due:z.gold>0&&base>=nisab?Math.round(base*0.025):0};
 }
 function vZakat(){
   const co=comp();const z=ui.zk||{date:todayISO(),gold:num(co.goldPrice),stock:"",od:false};
@@ -1880,7 +1937,7 @@ function vZakat(){
   <section class="panel"><h3>Что входит в расчёт</h3><dl class="kv">
     <dt>Деньги в кассе</dt><dd>${rub(r.cash)}</dd>
     <dt>Товар на складе (${r.stockN} шт)</dt><dd>${rub(r.stock)}</dd>
-    <dt>Долги клиентов, которые платят</dt><dd>${rub(r.good)}</dd>
+    <dt>Долги клиентов, которые платят</dt><dd>${rub(r.good)}</dd>${r.lent?`<dt>Займы, выданные из кассы</dt><dd>${rub(r.lent)}</dd>`:""}
     <dt>Сомнительные долги (просрочка &gt; 90 дн.)</dt><dd>${z.od?rub(r.doubt):`<span class="muted">${rub(r.doubt)} — не учтены</span>`}</dd>
     <dt>Минус займы, которые нужно вернуть</dt><dd>− ${rub(r.qard)}</dd>
     <div class="sep"></div><dt class="strong">Облагаемое имущество</dt><dd class="strong">${rub(r.base)}</dd></dl></section>
@@ -2127,6 +2184,10 @@ document.addEventListener("click",async e=>{
     case "new-partner":mPartner();break;
     case "new-loan":mLoan();break;
     case "loan-more":mLoan(null,id);break;
+    case "new-draw":mDraw();break;
+    case "draw":mDraw(id);break;
+    case "save-draw":saveDraw(t.dataset.id||null);break;
+    case "del-draw":{const w=byId("draws",id);if(w&&((w.offsets||[]).length)){toast("Аванс уже частично зачтён — удалить нельзя");break}if(await remove("draws",id)){closeModal();toast("Удалено")}}break;
     case "new-expense":mExpense();break;
     case "new-cash":mCash();break;
     case "new-pay":mPay();break;
